@@ -1,0 +1,30 @@
+# Python
+__pycache__/
+*.py[cod]
+*.egg-info/
+
+# Virtual environment
+venv/
+.venv/
+env/
+
+# Django
+*.log
+local_settings.py
+
+# Build output of "manage.py collectstatic" -- regenerated on deploy.
+staticfiles/
+
+# Secrets -- never commit a real one of these
+.env
+
+# NOTE: media/ and db.sqlite3 are deliberately still tracked. The database holds
+# the demo complaints and references media/complaints/mountain.jpg, so ignoring
+# one without the other would give a fresh clone a broken image. For a real
+# deployment both should be untracked and backed up instead.
+
+# Editors / OS
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db

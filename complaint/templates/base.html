@@ -1,0 +1,596 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="ne">
+
+<head>
+
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+
+<title>{% block title %}माछापुच्छ्रे नागरिक गुनासो पोर्टल{% endblock %}</title>
+
+<!-- Bootstrap -->
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.7/dist/css/bootstrap.min.css" rel="stylesheet">
+
+<!-- Bootstrap Icons -->
+<link rel="stylesheet"
+href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.13.1/font/bootstrap-icons.min.css">
+
+<style>
+
+/*==================================================
+  DESIGN TOKENS
+  Every colour, size and shadow in the portal comes from here. Page-specific
+  stylesheets should reference these rather than repeating hex values.
+==================================================*/
+
+:root{
+
+/* --- brand --- */
+--brand:#0b6b45;          /* 7.2:1 on white */
+--brand-dark:#054e39;
+--brand-light:#e7f2ed;
+--accent:#b45309;         /* replaces #fd7e14, which was 2.57:1 on white and
+                             unreadable as a button label. This is 5.02:1. */
+
+/* --- surfaces --- */
+--page-bg:#eef3f8;
+--surface:#ffffff;
+--surface-muted:#f6f9fc;
+--border:#e2e8f0;
+
+/* --- text --- */
+--text:#0f172a;
+--text-muted:#5b6a7d;     /* darkened from #64748b to clear 4.5:1 */
+--text-subtle:#718093;
+
+/* --- status: paired bg/fg, each pair >= 4.5:1 --- */
+--pending-bg:#fef3c7;   --pending-fg:#8a5a00;
+--progress-bg:#dbeafe;  --progress-fg:#1e40af;
+--resolved-bg:#d1fae5;  --resolved-fg:#065f46;
+--danger-bg:#fee2e2;    --danger-fg:#b91c1c;
+
+/* --- elevation --- */
+--shadow-sm:0 2px 8px rgba(15,23,42,.06);
+--shadow:0 8px 25px rgba(15,23,42,.08);
+--shadow-lg:0 14px 40px rgba(15,23,42,.12);
+
+/* --- geometry --- */
+--radius:14px;
+--radius-lg:20px;
+
+/* --- fluid type ---
+   clamp() keeps headings readable on a 320px phone without capping them on
+   desktop. Nepali glyphs run wider than Latin, so the floors are conservative. */
+--fs-hero:clamp(1.6rem, 3.4vw, 2.6rem);
+--fs-hero-sub:clamp(1.05rem, 2vw, 1.6rem);
+--fs-banner:clamp(1.4rem, 3.4vw, 2.4rem);
+--fs-section:clamp(1.35rem, 3vw, 2.2rem);
+--fs-brand:clamp(0.85rem, 1.5vw, 1.15rem);
+--fs-lead:clamp(0.95rem, 1.4vw, 1.15rem);
+
+}
+
+*{
+margin:0;
+padding:0;
+box-sizing:border-box;
+}
+
+html{
+-webkit-text-size-adjust:100%;
+}
+
+body{
+
+font-family:
+"Nirmala UI",
+"Mangal",
+"Kalimati",
+sans-serif;
+
+background:var(--page-bg);
+
+color:var(--text);
+
+/* Safety net only. Anything that actually overflows is a bug to fix, not to
+   hide, but a stray wide element must never break the whole page. */
+overflow-x:hidden;
+
+}
+
+img{
+max-width:100%;
+height:auto;
+}
+
+/* Long Nepali words and complaint IDs must not push a card wider than the
+   screen. */
+h1,h2,h3,h4,h5,p,td,th,li,.card-body{
+overflow-wrap:anywhere;
+}
+
+/*===================== ACCESSIBILITY =====================*/
+
+/* Visible keyboard focus. Bootstrap's default is easy to lose against the
+   green buttons. */
+a:focus-visible,
+button:focus-visible,
+input:focus-visible,
+select:focus-visible,
+textarea:focus-visible,
+.btn:focus-visible{
+outline:3px solid var(--brand);
+outline-offset:2px;
+box-shadow:none;
+}
+
+@media (prefers-reduced-motion: reduce){
+*,
+*::before,
+*::after{
+animation-duration:.001ms !important;
+transition-duration:.001ms !important;
+scroll-behavior:auto !important;
+}
+}
+
+/*===================== NAVBAR =====================*/
+
+.navbar{
+
+background:var(--surface);
+
+box-shadow:var(--shadow-sm);
+
+padding:10px 0;
+
+}
+
+.logo{
+
+width:clamp(34px, 5vw, 46px);
+
+height:clamp(34px, 5vw, 46px);
+
+object-fit:contain;
+
+margin-right:10px;
+
+flex:0 0 auto;
+
+}
+
+.navbar-brand{
+
+font-size:var(--fs-brand);
+
+font-weight:700;
+
+line-height:1.2;
+
+color:var(--brand) !important;
+
+/* The municipality name is long. Cap it and let it wrap to two tidy lines
+   rather than pushing into the menu, which it was doing. */
+max-width:min(38vw, 260px);
+
+min-width:0;
+
+white-space:normal;
+
+margin-right:.5rem;
+
+}
+
+.navbar .nav-link{
+
+font-weight:600;
+
+color:var(--text-muted);
+
+/* Menu labels are short Nepali phrases; breaking them mid-word ("लगइ न")
+   looks like a rendering fault. */
+white-space:nowrap;
+
+font-size:clamp(0.82rem, 1vw, 0.95rem);
+
+padding-left:.55rem;
+
+padding-right:.55rem;
+
+}
+
+.navbar .navbar-nav .btn{
+
+white-space:nowrap;
+
+font-size:clamp(0.8rem, 1vw, 0.9rem);
+
+}
+
+.navbar .nav-link:hover,
+.navbar .nav-link.active{
+
+color:var(--brand);
+
+}
+
+/* Drawer state (below xl). Slides in from the right instead of pushing the
+   whole page down, so the content behind it stays put. */
+@media (max-width: 1199.98px){
+
+.offcanvas{
+width:min(310px, 82vw);
+border-left:4px solid var(--brand);
+}
+
+.offcanvas-header{
+background:var(--brand-light);
+border-bottom:1px solid var(--border);
+}
+
+.offcanvas-title{
+color:var(--brand);
+font-weight:700;
+margin:0;
+}
+
+.offcanvas-body{
+padding:14px 16px 24px;
+}
+
+/* Left-aligned rows with a divider read as a menu; the centred stack the
+   dropdown produced did not. */
+.offcanvas-body .navbar-nav{
+width:100%;
+}
+
+.offcanvas-body .nav-item{
+width:100%;
+}
+
+.offcanvas-body .nav-link{
+padding:12px 6px;
+border-bottom:1px solid var(--border);
+font-size:1rem;
+}
+
+.offcanvas-body .nav-link.active{
+color:var(--brand);
+font-weight:700;
+}
+
+.offcanvas-body .btn{
+width:100%;
+margin-top:10px;
+}
+
+.navbar-brand{
+max-width:min(70vw, 320px);
+}
+
+}
+
+/*===================== BANNER =====================*/
+
+.banner{
+
+background:
+linear-gradient(rgba(0,70,45,.78),rgba(0,70,45,.78)),
+url("{% static 'images/mountain.jpg' %}");
+
+background-size:cover;
+
+background-position:center;
+
+padding:clamp(38px, 7vw, 68px) 18px;
+
+text-align:center;
+
+color:#fff;
+
+}
+
+.banner h2{
+
+font-size:var(--fs-banner);
+
+font-weight:800;
+
+line-height:1.3;
+
+}
+
+.banner p{
+
+font-size:var(--fs-lead);
+
+margin-top:12px;
+
+margin-bottom:0;
+
+}
+
+/*===================== CARDS =====================*/
+
+.card{
+
+border:none;
+
+border-radius:var(--radius-lg);
+
+box-shadow:var(--shadow);
+
+}
+
+.section-title{
+
+font-size:var(--fs-section);
+
+font-weight:800;
+
+line-height:1.3;
+
+color:var(--brand);
+
+}
+
+/* Cards that deliberately overlap the banner above them. The overlap has to
+   shrink on small screens or the heading disappears behind the card. */
+.overlap-card{
+margin-top:-45px;
+position:relative;
+z-index:10;
+}
+
+@media (max-width: 575.98px){
+.overlap-card{
+margin-top:-22px;
+}
+}
+
+/*===================== TABLES =====================*/
+
+/* Wide tables (the ranking has nine columns) scroll sideways instead of
+   crushing their contents. */
+.table-responsive{
+-webkit-overflow-scrolling:touch;
+}
+
+.table thead th{
+white-space:nowrap;
+}
+
+/*===================== BUTTONS =====================*/
+
+/* Comfortable touch targets on phones. */
+@media (max-width: 767.98px){
+.btn{
+min-height:44px;
+display:inline-flex;
+align-items:center;
+justify-content:center;
+gap:.35rem;
+}
+}
+
+.text-accent{ color:var(--accent) !important; }
+.text-brand{ color:var(--brand) !important; }
+
+/* Bootstrap's #64748b clears AA on white (4.76:1) but only just, and drops to
+   4.10:1 on our tinted page background. Slightly darkened so it passes on
+   both surfaces: 5.52:1 on white, 4.95:1 on --page-bg. */
+.text-muted{ color:var(--text-muted) !important; }
+
+.btn-accent{
+background:var(--accent);
+border-color:var(--accent);
+color:#fff;
+}
+
+.btn-accent:hover,
+.btn-accent:focus{
+background:#95440a;
+border-color:#95440a;
+color:#fff;
+}
+
+/*===================== STATUS BADGES =====================*/
+
+.badge-pending{ background:var(--pending-bg); color:var(--pending-fg); }
+.badge-progress{ background:var(--progress-bg); color:var(--progress-fg); }
+.badge-resolved{ background:var(--resolved-bg); color:var(--resolved-fg); }
+
+/*===================== FOOTER =====================*/
+
+footer{
+
+background:var(--brand-dark);
+
+color:#fff;
+
+padding:clamp(26px, 4vw, 38px) 0;
+
+margin-top:clamp(40px, 7vw, 70px);
+
+}
+
+footer a{
+color:#c9e7da;
+}
+
+</style>
+
+{% block extra_css %}{% endblock %}
+
+</head>
+
+<body>
+
+{% block navbar %}
+
+{% comment %}
+expand-xl, not -lg: nine items plus the municipality name do not fit a 1024px
+row and were overlapping the brand. Below xl the menu is an offcanvas drawer
+sliding in from the right, rather than a dropdown that pushed the page down.
+{% endcomment %}
+<nav class="navbar navbar-expand-xl">
+
+<div class="container">
+
+<a class="navbar-brand d-flex align-items-center" href="{% url 'home' %}">
+
+<img src="{% static 'images/logo.jpg' %}" class="logo" alt="Logo">
+
+<span>माछापुच्छ्रे गाउँपालिका</span>
+
+</a>
+
+<button class="navbar-toggler" type="button"
+data-bs-toggle="offcanvas" data-bs-target="#mainNav"
+aria-controls="mainNav" aria-label="मेनु">
+
+<span class="navbar-toggler-icon"></span>
+
+</button>
+
+<div class="offcanvas offcanvas-end offcanvas-xl" tabindex="-1" id="mainNav"
+aria-labelledby="mainNavLabel">
+
+<div class="offcanvas-header">
+
+<h5 class="offcanvas-title" id="mainNavLabel">
+
+<i class="bi bi-list"></i> मेनु
+
+</h5>
+
+<button type="button" class="btn-close" data-bs-dismiss="offcanvas"
+aria-label="बन्द गर्नुहोस्"></button>
+
+</div>
+
+<div class="offcanvas-body justify-content-end">
+
+<ul class="navbar-nav align-items-xl-center gap-xl-1">
+
+<li class="nav-item">
+<a class="nav-link {% if active_nav == 'home' %}active{% endif %}"
+href="{% url 'home' %}">
+<i class="bi bi-house"></i> गृहपृष्ठ
+</a>
+</li>
+
+<li class="nav-item">
+<a class="nav-link {% if active_nav == 'register' %}active{% endif %}"
+href="{% url 'complaint_register' %}">
+<i class="bi bi-pencil-square"></i> गुनासो दर्ता
+</a>
+</li>
+
+<li class="nav-item">
+<a class="nav-link {% if active_nav == 'track' %}active{% endif %}"
+href="{% url 'complaint_track' %}">
+<i class="bi bi-search"></i> गुनासो ट्र्याक
+</a>
+</li>
+
+<li class="nav-item">
+<a class="nav-link {% if active_nav == 'public' %}active{% endif %}"
+href="{% url 'public_complaints' %}">
+<i class="bi bi-people"></i> सार्वजनिक गुनासो
+</a>
+</li>
+
+<li class="nav-item">
+<a class="nav-link {% if active_nav == 'ranking' %}active{% endif %}"
+href="{% url 'ward_ranking' %}">
+<i class="bi bi-trophy"></i> वडा र्‍याङ्किङ
+</a>
+</li>
+
+{% if current_citizen %}
+
+<li class="nav-item">
+<a class="nav-link {% if active_nav == 'citizen' %}active{% endif %}"
+href="{% url 'my_complaints' %}">
+<i class="bi bi-folder2-open"></i> मेरा गुनासोहरू
+</a>
+</li>
+
+{% endif %}
+
+{% block extra_nav %}{% endblock %}
+
+{% if current_citizen %}
+
+<li class="nav-item">
+<a class="btn btn-outline-secondary ms-lg-2" href="{% url 'citizen_logout' %}">
+<i class="bi bi-box-arrow-right"></i> लगआउट
+</a>
+</li>
+
+{% else %}
+
+<li class="nav-item">
+<a class="nav-link" href="{% url 'citizen_login' %}">
+<i class="bi bi-phone"></i> लगइन
+</a>
+</li>
+
+<li class="nav-item">
+<a class="btn btn-outline-success ms-lg-2" href="{% url 'citizen_signup' %}">
+<i class="bi bi-person-plus"></i> नयाँ खाता
+</a>
+</li>
+
+{% endif %}
+
+<li class="nav-item">
+<a class="btn btn-success ms-lg-2" href="{% url 'ward_login' %}">
+<i class="bi bi-person-lock"></i> वडा लगइन
+</a>
+</li>
+
+</ul>
+
+</div>
+
+</div>
+
+</div>
+
+</nav>
+
+{% endblock %}
+
+{% block content %}{% endblock %}
+
+{% block footer %}
+
+<footer>
+
+<div class="container text-center">
+
+<h4 class="fw-bold">माछापुच्छ्रे गाउँपालिका</h4>
+
+<p class="mb-2">माछापुच्छ्रे नागरिक गुनासो पोर्टल</p>
+
+<p class="mb-1">कास्की, गण्डकी प्रदेश, नेपाल</p>
+
+<small>© २०२६ माछापुच्छ्रे गाउँपालिका । सबै अधिकार सुरक्षित।</small>
+
+</div>
+
+</footer>
+
+{% endblock %}
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.7/dist/js/bootstrap.bundle.min.js"></script>
+
+{% block extra_js %}{% endblock %}
+
+</body>
+
+</html>

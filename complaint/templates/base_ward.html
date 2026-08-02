@@ -1,0 +1,58 @@
+{% extends "base.html" %}
+
+{# Shared shell for the logged-in ward office pages. #}
+
+{% block extra_css %}
+
+<style>
+
+.navbar{
+
+background:var(--brand-dark);
+
+}
+
+.navbar-brand{
+
+color:#ffffff !important;
+
+}
+
+</style>
+
+{% endblock %}
+
+
+{% block navbar %}
+
+<nav class="navbar navbar-dark">
+
+<div class="container">
+
+<span class="navbar-brand fw-bold">
+
+🏛️ वडा नं. {{ ward.ward_number }} कार्यालय
+
+</span>
+
+<div class="d-flex gap-2">
+
+<a href="{% url 'ward_dashboard' %}" class="btn btn-outline-light">
+
+<i class="bi bi-speedometer2"></i> ड्यासबोर्ड
+
+</a>
+
+<a href="{% url 'ward_logout' %}" class="btn btn-light">
+
+<i class="bi bi-box-arrow-right"></i> लगआउट
+
+</a>
+
+</div>
+
+</div>
+
+</nav>
+
+{% endblock %}

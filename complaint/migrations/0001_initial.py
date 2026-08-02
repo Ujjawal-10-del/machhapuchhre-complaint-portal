@@ -26,7 +26,6 @@ class Migration(migrations.Migration):
                 ('description', models.TextField()),
                 ('image', models.ImageField(blank=True, null=True, upload_to='complaints/')),
                 ('status', models.CharField(choices=[('Pending', 'Pending'), ('In Progress', 'In Progress'), ('Resolved', 'Resolved')], default='Pending', max_length=20)),
-                ('reply', models.TextField(blank=True, null=True)),
                 ('created_at', models.DateTimeField(auto_now_add=True)),
             ],
         ),
