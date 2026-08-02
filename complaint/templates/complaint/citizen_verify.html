@@ -1,0 +1,123 @@
+{% extends "base.html" %}
+
+{% block title %}कोड प्रविष्ट गर्नुहोस् | माछापुच्छ्रे गाउँपालिका{% endblock %}
+
+{% block extra_css %}
+
+<style>
+
+.code-input{
+
+/* Fluid so six digits plus tracking always fit a small phone. */
+font-size:clamp(1.3rem, 7vw, 2rem);
+
+letter-spacing:clamp(5px, 2.5vw, 14px);
+
+text-align:center;
+
+font-weight:700;
+
+}
+
+</style>
+
+{% endblock %}
+
+
+{% block content %}
+
+<div class="container mt-5">
+
+<div class="row justify-content-center">
+
+<div class="col-md-6">
+
+
+<div class="card">
+
+<div class="card-body p-5">
+
+
+<h3 class="text-center text-success mb-2">
+
+<i class="bi bi-shield-lock"></i>
+
+कोड प्रविष्ट गर्नुहोस्
+
+</h3>
+
+
+<p class="text-center text-muted">
+
+<strong>{{ phone }}</strong> मा पठाइएको ६ अंकको कोड हाल्नुहोस्।
+
+</p>
+
+
+{% if error %}
+
+<div class="alert alert-danger text-center">
+
+{{ error }}
+
+</div>
+
+{% endif %}
+
+
+<form method="POST">
+
+{% csrf_token %}
+
+
+<input
+type="text"
+name="code"
+class="form-control form-control-lg code-input mb-4"
+placeholder="------"
+maxlength="6"
+minlength="6"
+pattern="[0-9]{6}"
+inputmode="numeric"
+autocomplete="one-time-code"
+autofocus
+required>
+
+
+<button type="submit" class="btn btn-success w-100 btn-lg">
+
+<i class="bi bi-box-arrow-in-right"></i>
+
+लगइन गर्नुहोस्
+
+</button>
+
+
+</form>
+
+
+<div class="text-center mt-4">
+
+<a href="{% url 'citizen_login' %}" class="btn btn-sm btn-outline-secondary">
+
+<i class="bi bi-arrow-clockwise"></i>
+
+नयाँ कोड माग्नुहोस्
+
+</a>
+
+</div>
+
+
+</div>
+
+</div>
+
+
+</div>
+
+</div>
+
+</div>
+
+{% endblock %}

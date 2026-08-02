@@ -1,0 +1,196 @@
+{% extends "base.html" %}
+
+{% block title %}नयाँ खाता | माछापुच्छ्रे गाउँपालिका{% endblock %}
+
+{% block content %}
+
+<div class="container mt-5">
+
+<div class="row justify-content-center">
+
+<div class="col-md-7">
+
+
+<div class="card">
+
+<div class="card-body p-5">
+
+
+<h3 class="text-center text-success mb-2">
+
+<i class="bi bi-person-plus"></i>
+
+नयाँ खाता खोल्नुहोस्
+
+</h3>
+
+
+<p class="text-center text-muted">
+
+मोबाइल नम्बर मात्र चाहिन्छ। पासवर्ड सम्झनु पर्दैन।
+
+</p>
+
+
+{% if error %}
+
+<div class="alert alert-danger text-center">
+
+{{ error }}
+
+</div>
+
+{% endif %}
+
+
+<form method="POST">
+
+{% csrf_token %}
+
+
+<label class="form-label fw-bold">मोबाइल नम्बर</label>
+
+<input
+type="text"
+name="phone"
+id="id_phone"
+class="form-control form-control-lg mb-4"
+placeholder="९८XXXXXXXX"
+maxlength="10"
+minlength="10"
+pattern="9[78][0-9]{8}"
+inputmode="numeric"
+autocomplete="tel"
+autofocus
+required>
+
+
+<button type="submit" class="btn btn-success w-100 btn-lg">
+
+<i class="bi bi-send"></i>
+
+कोड पठाउनुहोस्
+
+</button>
+
+
+</form>
+
+
+<hr class="my-4">
+
+
+<h6 class="fw-bold">खाता खोल्दा के फाइदा?</h6>
+
+<div class="row g-3 mt-1">
+
+<div class="col-md-6">
+
+<div class="d-flex gap-2">
+
+<i class="bi bi-clock-history text-success fs-4"></i>
+
+<div>
+
+<strong>गुनासोको इतिहास</strong>
+
+<div class="text-muted small">
+
+आफूले दर्ता गरेका सबै गुनासो एकै ठाउँमा। गुनासो ID टिपेर
+राख्नु पर्दैन।
+
+</div>
+
+</div>
+
+</div>
+
+</div>
+
+<div class="col-md-6">
+
+<div class="d-flex gap-2">
+
+<i class="bi bi-magic text-success fs-4"></i>
+
+<div>
+
+<strong>फारम आफैँ भरिन्छ</strong>
+
+<div class="text-muted small">
+
+नाम, नम्बर र ठेगाना हरेक पटक लेख्नु पर्दैन।
+
+</div>
+
+</div>
+
+</div>
+
+</div>
+
+</div>
+
+
+<div class="alert alert-light border small mt-4 mb-0">
+
+<i class="bi bi-info-circle"></i>
+
+खाता <strong>अनिवार्य होइन</strong>। खाता नखोली पनि गुनासो दर्ता गर्न
+सकिन्छ — तर त्यसो गर्दा गुनासो ID आफैँ सुरक्षित राख्नुपर्छ।
+
+</div>
+
+
+<div class="text-center mt-3">
+
+<span class="text-muted small">पहिले नै खाता छ?</span>
+
+<a href="{% url 'citizen_login' %}">लगइन गर्नुहोस्</a>
+
+</div>
+
+
+</div>
+
+</div>
+
+
+</div>
+
+</div>
+
+</div>
+
+{% endblock %}
+
+
+{% block extra_js %}
+
+<script>
+
+const phoneInput = document.getElementById("id_phone");
+
+if(phoneInput){
+
+    phoneInput.addEventListener("input", function(){
+
+        let digits = this.value.replace(/\D/g, "");
+
+        if(digits.startsWith("977") && digits.length > 10){
+            digits = digits.slice(3);
+        }
+
+        if(digits.startsWith("0") && digits.length > 10){
+            digits = digits.slice(1);
+        }
+
+        this.value = digits.slice(0, 10);
+
+    });
+
+}
+
+</script>
+
+{% endblock %}

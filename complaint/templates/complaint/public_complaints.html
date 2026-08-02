@@ -1,0 +1,404 @@
+{% extends "base.html" %}
+
+{% block title %}सार्वजनिक गुनासो | माछापुच्छ्रे गाउँपालिका{% endblock %}
+
+{% block extra_css %}
+
+<style>
+
+/* overlap handled by the shared .overlap-card class */
+
+.complaint-card{
+
+transition:.25s;
+
+height:100%;
+
+}
+
+.complaint-card:hover{
+
+transform:translateY(-4px);
+
+}
+
+.upvote-btn{
+
+min-width:92px;
+
+border-radius:12px;
+
+font-weight:700;
+
+}
+
+.upvote-count{
+
+font-size:clamp(1.05rem, 3vw, 1.25rem);
+
+line-height:1;
+
+display:block;
+
+}
+
+.upvote-label{
+
+font-size:clamp(0.7rem, 2vw, 0.75rem);
+
+font-weight:600;
+
+}
+
+.excerpt{
+
+color:var(--text-muted);
+
+display:-webkit-box;
+
+-webkit-line-clamp:3;
+
+-webkit-box-orient:vertical;
+
+overflow:hidden;
+
+}
+
+.meta{
+
+font-size:clamp(0.75rem, 2.2vw, 0.8125rem);
+
+color:var(--text-subtle);
+
+}
+
+</style>
+
+{% endblock %}
+
+
+{% block content %}
+
+<section class="banner">
+
+<div class="container">
+
+<h2>
+
+<i class="bi bi-people-fill"></i>
+
+सार्वजनिक गुनासो
+
+</h2>
+
+<p>
+
+अरू नागरिकले उठाएका समस्या हेर्नुहोस्। तपाईंलाई पनि उही समस्या परेको छ भने
+<strong>“मलाई पनि”</strong> थिच्नुहोस्।
+
+</p>
+
+</div>
+
+</section>
+
+
+<div class="container">
+
+
+<!-- ================= FILTERS ================= -->
+
+<div class="card overlap-card mb-4">
+
+<div class="card-body p-4">
+
+<form method="GET" class="row g-3 align-items-end">
+
+
+<div class="col-lg-4 col-md-6">
+
+<label class="form-label fw-bold">खोज्नुहोस्</label>
+
+<input
+type="text"
+name="q"
+value="{{ query }}"
+class="form-control"
+placeholder="समस्या खोज्नुहोस्...">
+
+</div>
+
+
+<div class="col-lg-2 col-md-6">
+
+<label class="form-label fw-bold">प्रकार</label>
+
+<select name="category" class="form-select">
+
+<option value="">सबै</option>
+
+{% for value, label in categories %}
+
+<option value="{{ value }}"
+{% if selected_category == value %}selected{% endif %}>
+{{ label }}
+</option>
+
+{% endfor %}
+
+</select>
+
+</div>
+
+
+<div class="col-lg-2 col-md-6">
+
+<label class="form-label fw-bold">वडा</label>
+
+<select name="ward" class="form-select">
+
+<option value="">सबै</option>
+
+{% for value, label in wards %}
+
+<option value="{{ value }}"
+{% if selected_ward == value|stringformat:"s" %}selected{% endif %}>
+{{ label }}
+</option>
+
+{% endfor %}
+
+</select>
+
+</div>
+
+
+<div class="col-lg-2 col-md-6">
+
+<label class="form-label fw-bold">क्रम</label>
+
+<select name="sort" class="form-select">
+
+<option value="popular" {% if sort == "popular" %}selected{% endif %}>
+बढी समर्थन
+</option>
+
+<option value="recent" {% if sort == "recent" %}selected{% endif %}>
+नयाँ पहिले
+</option>
+
+</select>
+
+</div>
+
+
+<div class="col-lg-2">
+
+<button type="submit" class="btn btn-success w-100">
+
+<i class="bi bi-funnel"></i> छान्नुहोस्
+
+</button>
+
+</div>
+
+
+</form>
+
+</div>
+
+</div>
+
+
+<p class="text-muted mb-4">
+
+जम्मा <strong>{{ total_public }}</strong> वटा सार्वजनिक गुनासो
+
+</p>
+
+
+<!-- ================= LIST ================= -->
+
+<div class="row g-4">
+
+{% for complaint in complaints %}
+
+<div class="col-lg-6">
+
+<div class="card complaint-card">
+
+<div class="card-body p-4">
+
+<div class="d-flex gap-3">
+
+
+<!-- upvote -->
+
+<div class="text-center">
+
+<form method="POST"
+action="{% url 'upvote_complaint' complaint.id %}">
+
+{% csrf_token %}
+
+<input type="hidden" name="next" value="{{ request.get_full_path }}">
+
+<button type="submit"
+class="btn upvote-btn {% if complaint.id in upvoted_ids %}btn-success{% else %}btn-outline-success{% endif %}">
+
+<i class="bi bi-hand-thumbs-up{% if complaint.id in upvoted_ids %}-fill{% endif %}"></i>
+
+<span class="upvote-count">{{ complaint.upvote_count }}</span>
+
+<span class="upvote-label">
+
+{% if complaint.id in upvoted_ids %}
+
+मैले समर्थन गरें
+
+{% else %}
+
+मलाई पनि
+
+{% endif %}
+
+</span>
+
+</button>
+
+</form>
+
+</div>
+
+
+<!-- body -->
+
+<div class="flex-grow-1">
+
+<div class="d-flex justify-content-between align-items-start gap-2">
+
+<h5 class="fw-bold mb-1">
+
+<a href="{% url 'public_complaint_detail' complaint.id %}"
+class="text-decoration-none text-dark">
+
+{{ complaint.subject }}
+
+</a>
+
+</h5>
+
+{% if complaint.status == "Resolved" %}
+
+<span class="badge bg-success">समाधान</span>
+
+{% elif complaint.status == "In Progress" %}
+
+<span class="badge bg-primary">प्रक्रियामा</span>
+
+{% else %}
+
+<span class="badge bg-warning text-dark">पेन्डिङ</span>
+
+{% endif %}
+
+</div>
+
+
+<p class="excerpt mb-2">{{ complaint.description }}</p>
+
+
+<div class="meta">
+
+<i class="bi bi-geo-alt"></i> वडा नं. {{ complaint.ward }}
+
+&nbsp;·&nbsp;
+
+<i class="bi bi-tag"></i> {{ complaint.category }}
+
+&nbsp;·&nbsp;
+
+<i class="bi bi-person"></i> {{ complaint.public_author }}
+
+&nbsp;·&nbsp;
+
+{{ complaint.created_at|date:"d M Y" }}
+
+</div>
+
+</div>
+
+
+</div>
+
+</div>
+
+</div>
+
+</div>
+
+{% empty %}
+
+<div class="col-12">
+
+<div class="card p-5 text-center">
+
+<h5 class="text-muted mb-0">
+
+कुनै सार्वजनिक गुनासो फेला परेन।
+
+</h5>
+
+</div>
+
+</div>
+
+{% endfor %}
+
+</div>
+
+
+{% include "complaint/_pagination.html" %}
+
+
+<!-- ================= PRIVACY NOTE ================= -->
+
+<div class="alert alert-light border mt-5">
+
+<h6 class="fw-bold">
+
+<i class="bi bi-shield-lock"></i>
+
+गोपनीयता
+
+</h6>
+
+<ul class="mb-0 small text-muted">
+
+<li>
+
+फोन नम्बर र ठेगाना कहिल्यै सार्वजनिक गरिँदैन।
+
+</li>
+
+<li>
+
+नाम देखाउने वा नदेखाउने निर्णय गुनासो दर्ता गर्ने नागरिकको हो।
+सहमति नदिएमा “अज्ञात नागरिक” देखिन्छ।
+
+</li>
+
+<li>
+
+आपत्तिजनक सामग्री भएमा सम्बन्धित वडा कार्यालयले हटाउन सक्छ।
+
+</li>
+
+</ul>
+
+</div>
+
+
+</div>
+
+{% endblock %}

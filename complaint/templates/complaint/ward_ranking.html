@@ -1,0 +1,523 @@
+{% extends "base.html" %}
+
+{% block title %}वडा र्‍याङ्किङ | माछापुच्छ्रे गाउँपालिका{% endblock %}
+
+{% block extra_css %}
+
+<style>
+
+/* overlap handled by the shared .overlap-card class */
+
+.stat-tile{
+
+padding:clamp(12px, 2.5vw, 22px);
+
+text-align:center;
+
+}
+
+.stat-tile h2{
+
+font-size:clamp(1.4rem, 4.5vw, 2rem);
+
+font-weight:800;
+
+margin-bottom:2px;
+
+}
+
+.stat-tile p{
+
+margin-bottom:0;
+
+color:var(--text-muted);
+
+font-weight:600;
+
+}
+
+.rank-badge{
+
+display:inline-flex;
+
+align-items:center;
+
+justify-content:center;
+
+width:38px;
+
+height:38px;
+
+border-radius:50%;
+
+background:var(--border);
+
+color:var(--text);
+
+font-weight:800;
+
+}
+
+.rank-1{ background:#fde68a; color:#78350f; }
+.rank-2{ background:#e2e8f0; color:#334155; }
+.rank-3{ background:#fed7aa; color:#7c2d12; }
+
+.progress{
+
+height:22px;
+
+border-radius:8px;
+
+background:var(--border);
+
+}
+
+.progress-bar{
+
+font-weight:700;
+
+font-size:clamp(0.7rem, 2vw, 0.8125rem);
+
+}
+
+.ward-name{
+
+font-weight:700;
+
+color:var(--brand);
+
+}
+
+.table > :not(caption) > * > *{
+
+padding:14px 12px;
+
+}
+
+.unranked-row{
+
+color:var(--text-subtle);
+
+}
+
+</style>
+
+{% endblock %}
+
+
+{% block content %}
+
+<section class="banner">
+
+<div class="container">
+
+<h2>
+
+<i class="bi bi-trophy"></i>
+
+वडा कार्यसम्पादन र्‍याङ्किङ
+
+</h2>
+
+<p>
+
+कुन वडा कार्यालयले कति गुनासो समाधान गर्‍यो — खुला रूपमा हेर्नुहोस्।
+
+</p>
+
+</div>
+
+</section>
+
+
+<div class="container">
+
+
+<!-- ================= MUNICIPALITY TOTALS ================= -->
+
+<div class="card overlap-card mb-5">
+
+<div class="card-body">
+
+<div class="row">
+
+<div class="col-md-3 col-6">
+
+<div class="stat-tile">
+
+<h2 class="text-dark">{{ totals.total }}</h2>
+
+<p>कुल गुनासो</p>
+
+</div>
+
+</div>
+
+<div class="col-md-3 col-6">
+
+<div class="stat-tile">
+
+<h2 class="text-success">{{ totals.resolved }}</h2>
+
+<p>समाधान भएको</p>
+
+</div>
+
+</div>
+
+<div class="col-md-3 col-6">
+
+<div class="stat-tile">
+
+<h2 class="text-primary">{{ totals.in_progress }}</h2>
+
+<p>प्रक्रियामा</p>
+
+</div>
+
+</div>
+
+<div class="col-md-3 col-6">
+
+<div class="stat-tile">
+
+<h2 class="text-warning">{{ totals.pending }}</h2>
+
+<p>पेन्डिङ</p>
+
+</div>
+
+</div>
+
+</div>
+
+
+{% if totals.rate is not None %}
+
+<div class="px-3 pb-2">
+
+<div class="d-flex justify-content-between mb-1">
+
+<span class="fw-bold">गाउँपालिकाको समग्र समाधान दर</span>
+
+<span class="fw-bold">{{ totals.rate|floatformat:1 }}%</span>
+
+</div>
+
+<div class="progress">
+
+<div class="progress-bar bg-success"
+role="progressbar"
+style="width: {{ totals.rate|floatformat:0 }}%;">
+</div>
+
+</div>
+
+</div>
+
+{% endif %}
+
+
+</div>
+
+</div>
+
+
+<!-- ================= RANKING TABLE ================= -->
+
+<div class="card p-4 mb-4">
+
+
+<h4 class="fw-bold mb-4">
+
+<i class="bi bi-bar-chart-line"></i>
+
+वडागत कार्यसम्पादन
+
+</h4>
+
+
+<div class="table-responsive">
+
+
+<table class="table table-hover align-middle mb-0">
+
+
+<thead class="table-success">
+
+<tr>
+
+<th style="width:70px;">क्रम</th>
+
+<th>वडा</th>
+
+<th class="text-center">कुल</th>
+
+<th class="text-center">समाधान</th>
+
+<th class="text-center" title="नागरिकले आफैँ पुष्टि गरेको संख्या">
+पुष्टि
+</th>
+
+<th class="text-center">प्रक्रियामा</th>
+
+<th class="text-center">पेन्डिङ</th>
+
+<th style="min-width:180px;">समाधान दर</th>
+
+<th class="text-center">औसत समय</th>
+
+</tr>
+
+</thead>
+
+
+<tbody>
+
+
+{% for ward in ranked %}
+
+<tr>
+
+<td>
+
+<span class="rank-badge rank-{{ ward.rank }}">
+
+{{ ward.rank }}
+
+</span>
+
+</td>
+
+<td>
+
+<div class="ward-name">{{ ward.label }}</div>
+
+{% if ward.office %}
+
+<small class="text-muted">{{ ward.office }}</small>
+
+{% endif %}
+
+</td>
+
+<td class="text-center fw-bold">{{ ward.total }}</td>
+
+<td class="text-center">
+
+<span class="badge bg-success">{{ ward.resolved }}</span>
+
+</td>
+
+<td class="text-center">
+
+{% if ward.confirmed %}
+
+<span class="badge bg-success">
+
+<i class="bi bi-patch-check-fill"></i> {{ ward.confirmed }}
+
+</span>
+
+{% else %}
+
+<span class="text-muted">—</span>
+
+{% endif %}
+
+{% if ward.disputed %}
+
+<br>
+
+<span class="badge bg-danger mt-1"
+title="नागरिकले समाधान भएको छैन भनेको">
+
+{{ ward.disputed }} असहमत
+
+</span>
+
+{% endif %}
+
+</td>
+
+<td class="text-center">
+
+<span class="badge bg-primary">{{ ward.in_progress }}</span>
+
+</td>
+
+<td class="text-center">
+
+<span class="badge bg-warning text-dark">{{ ward.pending }}</span>
+
+</td>
+
+<td>
+
+<div class="d-flex justify-content-between mb-1">
+
+<small class="fw-bold">{{ ward.rate|floatformat:1 }}%</small>
+
+</div>
+
+<div class="progress">
+
+<div
+class="progress-bar {% if ward.rate >= 75 %}bg-success{% elif ward.rate >= 40 %}bg-primary{% else %}bg-warning{% endif %}"
+role="progressbar"
+style="width: {{ ward.rate|floatformat:0 }}%;">
+</div>
+
+</div>
+
+</td>
+
+<td class="text-center">
+
+{% if ward.avg_days is not None %}
+
+{{ ward.avg_days|floatformat:1 }} दिन
+
+{% else %}
+
+<span class="text-muted">—</span>
+
+{% endif %}
+
+</td>
+
+</tr>
+
+{% endfor %}
+
+
+{% for ward in unranked %}
+
+<tr class="unranked-row">
+
+<td>
+
+<span class="rank-badge">—</span>
+
+</td>
+
+<td>
+
+<div class="ward-name text-muted">{{ ward.label }}</div>
+
+{% if ward.office %}
+
+<small class="text-muted">{{ ward.office }}</small>
+
+{% endif %}
+
+</td>
+
+<td class="text-center">0</td>
+
+<td class="text-center">0</td>
+
+<td class="text-center">—</td>
+
+<td class="text-center">0</td>
+
+<td class="text-center">0</td>
+
+<td>
+
+<small class="text-muted">कुनै गुनासो दर्ता भएको छैन</small>
+
+</td>
+
+<td class="text-center">—</td>
+
+</tr>
+
+{% endfor %}
+
+
+{% if not ranked and not unranked %}
+
+<tr>
+
+<td colspan="9" class="text-center">कुनै तथ्याङ्क उपलब्ध छैन।</td>
+
+</tr>
+
+{% endif %}
+
+
+</tbody>
+
+
+</table>
+
+
+</div>
+
+
+</div>
+
+
+<!-- ================= METHODOLOGY ================= -->
+
+<div class="alert alert-light border">
+
+<h6 class="fw-bold">
+
+<i class="bi bi-info-circle"></i>
+
+र्‍याङ्किङ कसरी निकालिन्छ?
+
+</h6>
+
+<ul class="mb-0 small text-muted">
+
+<li>
+
+समाधान दर = (समाधान भएका गुनासो ÷ कुल गुनासो) × १००
+
+</li>
+
+<li>
+
+दर बराबर भएमा बढी गुनासो व्यवस्थापन गर्ने वडा माथि राखिन्छ।
+
+</li>
+
+<li>
+
+कुनै गुनासो दर्ता नभएको वडालाई र्‍याङ्किङ दिइँदैन।
+
+</li>
+
+<li>
+
+औसत समय दर्ता मिति देखि समाधान मिति सम्मको हो।
+यो सुविधा भर्खर थपिएकोले पहिले समाधान भइसकेका गुनासोको समय उपलब्ध छैन।
+
+</li>
+
+<li>
+
+थोरै गुनासो भएको वडाको प्रतिशत सजिलै उच्च देखिन सक्ने हुँदा
+कुल गुनासो संख्या सँगै हेर्नुहोस्।
+
+</li>
+
+<li>
+
+<strong>पुष्टि</strong> भनेको नागरिक आफैँले “समाधान भयो” भनी
+स्वीकार गरेको संख्या हो। समाधान दर वडा कार्यालयको दाबी हो भने
+पुष्टि संख्या नागरिकको स्वतन्त्र प्रमाण हो — दुवै सँगै हेर्नुहोस्।
+
+</li>
+
+</ul>
+
+</div>
+
+
+</div>
+
+{% endblock %}

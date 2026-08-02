@@ -1,0 +1,160 @@
+{% extends "base.html" %}
+
+{% block title %}मेरो विवरण | माछापुच्छ्रे गाउँपालिका{% endblock %}
+
+{% block content %}
+
+<div class="container mt-5">
+
+<div class="row justify-content-center">
+
+<div class="col-md-7">
+
+
+<div class="card">
+
+<div class="card-body p-5">
+
+
+<h3 class="text-success mb-2">
+
+<i class="bi bi-person-vcard"></i>
+
+मेरो विवरण
+
+</h3>
+
+
+<p class="text-muted">
+
+यी विवरण गुनासो दर्ता फारममा आफैँ भरिनेछन्।
+
+</p>
+
+
+{% if saved %}
+
+<div class="alert alert-success d-flex justify-content-between align-items-center flex-wrap gap-2">
+
+<div>
+
+<i class="bi bi-check-circle-fill"></i>
+
+विवरण सुरक्षित भयो।
+
+</div>
+
+<a href="{% url 'my_complaints' %}" class="btn btn-sm btn-success">
+
+ड्यासबोर्डमा जानुहोस् <i class="bi bi-arrow-right"></i>
+
+</a>
+
+</div>
+
+{% endif %}
+
+
+{% if not citizen.profile_complete %}
+
+<div class="alert alert-info">
+
+<i class="bi bi-info-circle"></i>
+
+नाम र वडा भर्नुभयो भने गुनासो दर्ता गर्दा फारम आफैँ भरिनेछ।
+
+</div>
+
+{% endif %}
+
+
+<form method="POST">
+
+{% csrf_token %}
+
+
+<label class="form-label fw-bold">मोबाइल नम्बर</label>
+
+<input type="text" class="form-control mb-1"
+value="{{ citizen.phone }}" disabled>
+
+<div class="text-muted small mb-4">
+
+<i class="bi bi-lock"></i>
+
+यो नम्बर तपाईंको खाताको पहिचान हो, त्यसैले परिवर्तन गर्न मिल्दैन।
+
+</div>
+
+
+<label class="form-label fw-bold">
+
+{{ form.name.label }} <span class="text-danger">*</span>
+
+</label>
+
+{{ form.name }}
+
+{% if form.name.errors %}
+
+<div class="text-danger small">{{ form.name.errors.0 }}</div>
+
+{% endif %}
+
+<div class="mb-4"></div>
+
+
+<label class="form-label fw-bold">{{ form.address.label }}</label>
+
+{{ form.address }}
+
+<div class="mb-4"></div>
+
+
+<label class="form-label fw-bold">{{ form.ward.label }}</label>
+
+{{ form.ward }}
+
+<div class="mb-4"></div>
+
+
+<div class="d-flex gap-2 flex-wrap">
+
+{% comment %}
+No icon: bi-save is a floppy disk, which at button size reads as a download
+arrow and made this look like it exported something.
+{% endcomment %}
+<button type="submit" class="btn btn-success">
+
+सुरक्षित गर्नुहोस्
+
+</button>
+
+{% comment %}
+Labelled as a return rather than "cancel": it is only a link to the dashboard
+and discards nothing, so "cancel" was misleading once a save had happened.
+{% endcomment %}
+<a href="{% url 'my_complaints' %}" class="btn btn-outline-secondary">
+
+<i class="bi bi-arrow-left"></i> ड्यासबोर्डमा फर्कनुहोस्
+
+</a>
+
+</div>
+
+
+</form>
+
+
+</div>
+
+</div>
+
+
+</div>
+
+</div>
+
+</div>
+
+{% endblock %}

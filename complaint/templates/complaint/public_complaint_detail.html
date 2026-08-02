@@ -1,0 +1,208 @@
+{% extends "base.html" %}
+
+{% block title %}{{ complaint.subject }} | सार्वजनिक गुनासो{% endblock %}
+
+{% block content %}
+
+<div class="container mt-5">
+
+<div class="row justify-content-center">
+
+<div class="col-lg-9">
+
+
+<div class="card">
+
+
+<div class="card-header bg-success text-white d-flex justify-content-between align-items-center">
+
+<h4 class="mb-0">
+
+<i class="bi bi-megaphone"></i>
+
+सार्वजनिक गुनासो
+
+</h4>
+
+{% if complaint.status == "Resolved" %}
+
+<span class="badge bg-light text-success">समाधान भयो</span>
+
+{% elif complaint.status == "In Progress" %}
+
+<span class="badge bg-light text-primary">प्रक्रियामा</span>
+
+{% else %}
+
+<span class="badge bg-light text-dark">पेन्डिङ</span>
+
+{% endif %}
+
+</div>
+
+
+<div class="card-body p-4">
+
+
+<h3 class="fw-bold">{{ complaint.subject }}</h3>
+
+
+<p class="text-muted">
+
+<i class="bi bi-person"></i> {{ complaint.public_author }}
+
+&nbsp;·&nbsp;
+
+<i class="bi bi-geo-alt"></i> वडा नं. {{ complaint.ward }}
+
+&nbsp;·&nbsp;
+
+<i class="bi bi-tag"></i> {{ complaint.category }}
+
+&nbsp;·&nbsp;
+
+<i class="bi bi-calendar3"></i> {{ complaint.created_at|date:"d M Y" }}
+
+</p>
+
+
+<hr>
+
+
+<p class="fs-5">{{ complaint.description|linebreaks }}</p>
+
+
+{% if complaint.image %}
+
+<div class="text-center my-4">
+
+<img src="{{ complaint.image.url }}"
+class="img-fluid rounded shadow"
+style="max-height:380px;">
+
+</div>
+
+{% endif %}
+
+
+<!-- ================= UPVOTE ================= -->
+
+<div class="card bg-light border-0 my-4">
+
+<div class="card-body text-center p-4">
+
+
+<h5 class="fw-bold">
+
+तपाईंलाई पनि यही समस्या परेको छ?
+
+</h5>
+
+<p class="text-muted">
+
+समर्थन गर्नुभयो भने वडा कार्यालयलाई यो समस्या कति व्यापक छ भन्ने थाहा हुन्छ।
+
+</p>
+
+
+<form method="POST" action="{% url 'upvote_complaint' complaint.id %}">
+
+{% csrf_token %}
+
+<button type="submit"
+class="btn btn-lg {% if already_upvoted %}btn-success{% else %}btn-outline-success{% endif %}">
+
+<i class="bi bi-hand-thumbs-up{% if already_upvoted %}-fill{% endif %}"></i>
+
+{% if already_upvoted %}
+
+मैले समर्थन गरें ({{ complaint.upvote_count }})
+
+{% else %}
+
+मलाई पनि ({{ complaint.upvote_count }})
+
+{% endif %}
+
+</button>
+
+</form>
+
+
+{% if already_upvoted %}
+
+<small class="text-muted d-block mt-2">
+
+फेरि थिच्नुभयो भने समर्थन फिर्ता हुन्छ।
+
+</small>
+
+{% endif %}
+
+
+</div>
+
+</div>
+
+
+<!-- ================= OFFICE REPLY ================= -->
+
+{% if complaint.reply %}
+
+<div class="alert alert-success">
+
+<h6 class="fw-bold">
+
+<i class="bi bi-building"></i>
+
+वडा कार्यालयको जवाफ
+
+</h6>
+
+<p class="mb-0">{{ complaint.reply|linebreaks }}</p>
+
+{% if complaint.resolved_at %}
+
+<small class="text-muted">
+
+समाधान मिति: {{ complaint.resolved_at|date:"d M Y" }}
+
+</small>
+
+{% endif %}
+
+</div>
+
+{% endif %}
+
+
+<div class="text-center mt-4">
+
+<a href="{% url 'public_complaints' %}" class="btn btn-outline-success">
+
+<i class="bi bi-arrow-left"></i> सबै गुनासो
+
+</a>
+
+<a href="{% url 'complaint_register' %}" class="btn btn-success">
+
+<i class="bi bi-pencil-square"></i> आफ्नो गुनासो दर्ता गर्नुहोस्
+
+</a>
+
+</div>
+
+
+</div>
+
+
+</div>
+
+
+</div>
+
+</div>
+
+</div>
+
+{% endblock %}

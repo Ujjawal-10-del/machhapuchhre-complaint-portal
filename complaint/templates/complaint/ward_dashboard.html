@@ -1,75 +1,30 @@
-{% load static %}
+{% extends "base_ward.html" %}
 
-<!DOCTYPE html>
-<html lang="ne">
+{% block title %}वडा ड्यासबोर्ड | माछापुच्छ्रे गाउँपालिका{% endblock %}
 
-<head>
+{% block extra_css %}
 
-<meta charset="UTF-8">
-
-<meta name="viewport" content="width=device-width, initial-scale=1">
-
-<title>
-वडा ड्यासबोर्ड
-</title>
-
-
-<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.7/dist/css/bootstrap.min.css" rel="stylesheet">
-
-<link rel="stylesheet"
-href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.13.1/font/bootstrap-icons.min.css">
-
+{{ block.super }}
 
 <style>
 
-body{
-
-background:#eef3f8;
-
-font-family:
-"Nirmala UI",
-"Mangal",
-"Kalimati",
-sans-serif;
-
-}
-
-
-.navbar{
-
-background:#065f46;
-
-}
-
-
-.card{
-
-border:none;
-
-border-radius:18px;
-
-box-shadow:0 8px 25px rgba(0,0,0,.08);
-
-}
-
-
 .stat-card{
 
-padding:25px;
+padding:clamp(14px, 3vw, 25px);
 
 text-align:center;
 
 }
 
-
 .stat-card h2{
+
+font-size:clamp(1.4rem, 4.5vw, 2rem);
 
 font-weight:800;
 
-color:#065f46;
+color:var(--brand-dark);
 
 }
-
 
 .table{
 
@@ -81,45 +36,14 @@ overflow:hidden;
 
 }
 
-
 </style>
 
-
-</head>
-
-
-<body>
+{% endblock %}
 
 
-<nav class="navbar navbar-dark">
-
-<div class="container">
-
-
-<span class="navbar-brand fw-bold">
-
-🏛️ वडा नं. {{ ward.ward_number }} कार्यालय
-
-</span>
-
-
-<a href="{% url 'ward_logout' %}"
-
-class="btn btn-light">
-
-लगआउट
-
-</a>
-
-
-</div>
-
-</nav>
-
-
+{% block content %}
 
 <div class="container mt-5">
-
 
 
 <h3 class="mb-4 fw-bold">
@@ -129,7 +53,6 @@ class="btn btn-light">
 </h3>
 
 
-
 <div class="row g-4 mb-5">
 
 
@@ -137,67 +60,48 @@ class="btn btn-light">
 
 <div class="card stat-card">
 
-<h2>
-{{ total }}
-</h2>
+<h2>{{ total }}</h2>
 
-<p>
-कुल गुनासो
-</p>
+<p class="mb-0">कुल गुनासो</p>
 
 </div>
 
 </div>
-
 
 
 <div class="col-md-3">
 
 <div class="card stat-card">
 
-<h2>
-{{ pending }}
-</h2>
+<h2>{{ pending }}</h2>
 
-<p>
-Pending
-</p>
+<p class="mb-0">Pending</p>
 
 </div>
 
 </div>
-
 
 
 <div class="col-md-3">
 
 <div class="card stat-card">
 
-<h2>
-{{ in_progress }}
-</h2>
+<h2>{{ in_progress }}</h2>
 
-<p>
-In Progress
-</p>
+<p class="mb-0">In Progress</p>
 
 </div>
 
 </div>
-
 
 
 <div class="col-md-3">
 
 <div class="card stat-card">
 
-<h2>
-{{ resolved }}
-</h2>
+<h2>{{ resolved }}</h2>
 
-<p>
-Resolved
-</p>
+<p class="mb-0">Resolved</p>
 
 </div>
 
@@ -205,20 +109,96 @@ Resolved
 
 
 </div>
-
-
-
 
 
 <div class="card p-4">
 
 
-<h4 class="mb-4 fw-bold">
+<div class="d-flex justify-content-between align-items-center flex-wrap gap-2 mb-4">
+
+<h4 class="fw-bold mb-0">
 
 📋 गुनासो सूची
 
 </h4>
 
+{% if is_filtered %}
+
+<span class="text-muted">
+
+{{ filtered_count }} वटा फेला पर्‍यो
+
+<a href="{% url 'ward_dashboard' %}" class="ms-2">हटाउनुहोस्</a>
+
+</span>
+
+{% endif %}
+
+</div>
+
+
+<!-- ================= FILTERS ================= -->
+
+<form method="GET" class="row g-2 mb-4">
+
+<div class="col-lg-5 col-md-6">
+
+<input
+type="text"
+name="q"
+value="{{ query }}"
+class="form-control"
+placeholder="ID, नाम, शीर्षक वा विवरण खोज्नुहोस्...">
+
+</div>
+
+<div class="col-lg-3 col-md-6">
+
+<select name="status" class="form-select">
+
+<option value="">सबै स्थिति</option>
+
+{% for value, label in statuses %}
+
+<option value="{{ value }}" {% if selected_status == value %}selected{% endif %}>
+{{ label }}
+</option>
+
+{% endfor %}
+
+</select>
+
+</div>
+
+<div class="col-lg-2 col-md-6">
+
+<select name="category" class="form-select">
+
+<option value="">सबै प्रकार</option>
+
+{% for value, label in categories %}
+
+<option value="{{ value }}" {% if selected_category == value %}selected{% endif %}>
+{{ label }}
+</option>
+
+{% endfor %}
+
+</select>
+
+</div>
+
+<div class="col-lg-2 col-md-6">
+
+<button type="submit" class="btn btn-success w-100">
+
+<i class="bi bi-search"></i> खोज्नुहोस्
+
+</button>
+
+</div>
+
+</form>
 
 
 <div class="table-responsive">
@@ -229,39 +209,23 @@ Resolved
 
 <thead class="table-success">
 
-
 <tr>
 
-<th>
-ID
-</th>
+<th>ID</th>
 
-<th>
-नागरिक
-</th>
+<th>नागरिक</th>
 
-<th>
-शीर्षक
-</th>
+<th>शीर्षक</th>
 
-<th>
-प्राथमिकता
-</th>
+<th>प्राथमिकता</th>
 
-<th>
-स्थिति
-</th>
+<th>स्थिति</th>
 
-<th>
-कार्य
-</th>
-
+<th>कार्य</th>
 
 </tr>
 
-
 </thead>
-
 
 
 <tbody>
@@ -272,79 +236,42 @@ ID
 
 <tr>
 
+<td>{{ complaint.complaint_id }}</td>
+
+<td>{{ complaint.citizen_name }}</td>
+
+<td>{{ complaint.subject }}</td>
+
+<td>{{ complaint.priority }}</td>
 
 <td>
-
-{{ complaint.complaint_id }}
-
-</td>
-
-
-<td>
-
-{{ complaint.citizen_name }}
-
-</td>
-
-
-<td>
-
-{{ complaint.subject }}
-
-</td>
-
-
-<td>
-
-{{ complaint.priority }}
-
-</td>
-
-
-<td>
-
 
 {% if complaint.status == "Resolved" %}
 
-<span class="badge bg-success">
-Resolved
-</span>
-
+<span class="badge bg-success">Resolved</span>
 
 {% elif complaint.status == "In Progress" %}
 
-<span class="badge bg-primary">
-In Progress
-</span>
-
+<span class="badge bg-primary">In Progress</span>
 
 {% else %}
 
-<span class="badge bg-warning text-dark">
-Pending
-</span>
-
+<span class="badge bg-warning text-dark">Pending</span>
 
 {% endif %}
 
-
 </td>
-
 
 <td>
 
-
 <a href="{% url 'complaint_detail' complaint.id %}"
-
 class="btn btn-sm btn-success">
 
 हेर्नुहोस्
 
 </a>
 
-
 </td>
-
 
 </tr>
 
@@ -356,10 +283,17 @@ class="btn btn-sm btn-success">
 
 <td colspan="6" class="text-center">
 
+{% if is_filtered %}
+
+खोजसँग मिल्ने कुनै गुनासो फेला परेन।
+
+{% else %}
+
 कुनै गुनासो छैन।
 
-</td>
+{% endif %}
 
+</td>
 
 </tr>
 
@@ -376,13 +310,12 @@ class="btn btn-sm btn-success">
 </div>
 
 
+{% include "complaint/_pagination.html" %}
+
+
 </div>
 
 
-
 </div>
 
-
-</body>
-
-</html>
+{% endblock %}

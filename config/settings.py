@@ -10,6 +10,7 @@ For the full list of settings and their values, see
 https://docs.djangoproject.com/en/6.0/ref/settings/
 """
 
+import os
 from pathlib import Path
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
@@ -20,12 +21,32 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # See https://docs.djangoproject.com/en/6.0/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = 'django-insecure-uk^m)xp_lkd!o)_^pz%d(eb2gn*jix*8i*n7pel=8_cshpvwr5'
+#
+# Falls back to the original development key so the project still runs with no
+# configuration. Set DJANGO_SECRET_KEY in the environment before deploying --
+# session cookies and the upvote IP hashes are derived from this value.
+SECRET_KEY = os.environ.get(
+    'DJANGO_SECRET_KEY',
+    'django-insecure-uk^m)xp_lkd!o)_^pz%d(eb2gn*jix*8i*n7pel=8_cshpvwr5'
+)
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+# Set DJANGO_DEBUG=0 to turn it off.
+DEBUG = os.environ.get('DJANGO_DEBUG', '1') != '0'
 
-ALLOWED_HOSTS = []
+# Comma-separated list, e.g. DJANGO_ALLOWED_HOSTS=machhapuchhremun.gov.np
+ALLOWED_HOSTS = [
+    host.strip()
+    for host in os.environ.get('DJANGO_ALLOWED_HOSTS', '').split(',')
+    if host.strip()
+]
+
+# With DEBUG on, Django already permits localhost. Once it is off, an empty list
+# would reject every request, so fail loudly here instead of at request time.
+if not DEBUG and not ALLOWED_HOSTS:
+    raise RuntimeError(
+        "DJANGO_ALLOWED_HOSTS must be set when DJANGO_DEBUG=0."
+    )
 
 
 # Application definition
@@ -62,6 +83,7 @@ TEMPLATES = [
                 'django.template.context_processors.request',
                 'django.contrib.auth.context_processors.auth',
                 'django.contrib.messages.context_processors.messages',
+                'complaint.context_processors.citizen',
             ],
         },
     },
@@ -120,3 +142,129 @@ STATIC_URL = '/static/'
 STATICFILES_DIRS = [
     BASE_DIR / "complaint" / "static",
 ]
+
+# Destination for "manage.py collectstatic". Without this the command cannot
+# run at all, which blocks any real deployment.
+STATIC_ROOT = BASE_DIR / "staticfiles"
+
+# Uploaded files (complaint photos)
+
+MEDIA_URL = '/media/'
+
+MEDIA_ROOT = BASE_DIR / "media"
+
+
+# ==================================================
+# UPLOAD AND REQUEST LIMITS
+# ==================================================
+
+# Largest complaint photo accepted, in bytes. Enforced in ComplaintForm --
+# nothing in Django caps the size of an uploaded file by default, so without
+# this a single request could fill the disk.
+MAX_UPLOAD_SIZE = int(os.environ.get('MAX_UPLOAD_SIZE', 5 * 1024 * 1024))
+
+# Longest complaint description accepted, in characters. The textarea already
+# caps this in the browser, but that is trivially bypassed.
+MAX_DESCRIPTION_LENGTH = int(os.environ.get('MAX_DESCRIPTION_LENGTH', 2000))
+
+# Failed ward logins allowed from one address before a cooling-off period.
+LOGIN_ATTEMPT_LIMIT = int(os.environ.get('LOGIN_ATTEMPT_LIMIT', 10))
+
+LOGIN_ATTEMPT_WINDOW = int(os.environ.get('LOGIN_ATTEMPT_WINDOW', 900))
+
+
+# ==================================================
+# CITIZEN LOGIN (OPTIONAL, PHONE + OTP)
+# ==================================================
+
+# Citizen accounts are optional. Filing and tracking a complaint never needs
+# one; signing in only lets someone find their past complaints without the ID.
+
+# How long a code stays usable, in seconds.
+OTP_TTL_SECONDS = int(os.environ.get('OTP_TTL_SECONDS', 300))
+
+# Wrong guesses allowed against one code before it is burned. A 6-digit code
+# has a million combinations, so this must be small.
+OTP_MAX_ATTEMPTS = int(os.environ.get('OTP_MAX_ATTEMPTS', 5))
+
+# Codes that may be requested for one number per window. Every request sends a
+# billed SMS, so without this someone could drain the municipality's credit or
+# use the portal to repeatedly text a number they do not own.
+OTP_REQUEST_LIMIT = int(os.environ.get('OTP_REQUEST_LIMIT', 3))
+
+OTP_REQUEST_WINDOW = int(os.environ.get('OTP_REQUEST_WINDOW', 900))
+
+# Signing up is open to any valid mobile number, so the per-number cap above is
+# no longer enough on its own: one attacker could cycle through many numbers.
+# This second cap limits how many codes a single source can trigger at all.
+OTP_IP_REQUEST_LIMIT = int(os.environ.get('OTP_IP_REQUEST_LIMIT', 10))
+
+OTP_IP_REQUEST_WINDOW = int(os.environ.get('OTP_IP_REQUEST_WINDOW', 3600))
+
+
+# ==================================================
+# PRODUCTION HARDENING
+# ==================================================
+
+# Only applied with DEBUG off, so local development over plain HTTP still works.
+# Every one of these corresponds to a warning from "manage.py check --deploy".
+
+if not DEBUG:
+
+    # Cookies must not travel over plain HTTP.
+    SESSION_COOKIE_SECURE = True
+    CSRF_COOKIE_SECURE = True
+
+    # JavaScript has no reason to read either cookie.
+    SESSION_COOKIE_HTTPONLY = True
+    CSRF_COOKIE_HTTPONLY = True
+
+    SESSION_COOKIE_SAMESITE = 'Lax'
+    CSRF_COOKIE_SAMESITE = 'Lax'
+
+    # Redirect HTTP to HTTPS. Turn off with DJANGO_SSL_REDIRECT=0 if a reverse
+    # proxy already handles it.
+    SECURE_SSL_REDIRECT = os.environ.get('DJANGO_SSL_REDIRECT', '1') != '0'
+
+    # Start HSTS low. Raise it only once HTTPS is known to be working -- a long
+    # max-age is cached by browsers and cannot be taken back.
+    SECURE_HSTS_SECONDS = int(os.environ.get('SECURE_HSTS_SECONDS', 3600))
+    SECURE_HSTS_INCLUDE_SUBDOMAINS = True
+
+    # Trust the proxy's protocol header when running behind nginx.
+    if os.environ.get('DJANGO_BEHIND_PROXY', '0') == '1':
+        SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
+
+    SECURE_CONTENT_TYPE_NOSNIFF = True
+
+    X_FRAME_OPTIONS = 'DENY'
+
+
+# ==================================================
+# SMS NOTIFICATIONS
+# ==================================================
+
+# Default backend prints messages to the terminal instead of sending them, so
+# development and testing cost nothing. To go live, set SMS_BACKEND to a real
+# gateway and supply its token through the environment -- never commit a token.
+#
+#   set SMS_BACKEND=complaint.sms.SparrowSMSBackend
+#   set SPARROW_SMS_TOKEN=...
+#   set SPARROW_SMS_FROM=...
+
+SMS_BACKEND = os.environ.get(
+    'SMS_BACKEND',
+    'complaint.sms.ConsoleSMSBackend'
+)
+
+# Master switch. Set SMS_ENABLED=0 to stop all sending without changing code.
+SMS_ENABLED = os.environ.get('SMS_ENABLED', '1') != '0'
+
+# Seconds to wait on the gateway before giving up. Kept short: a slow gateway
+# must not hold up a ward officer's status update.
+SMS_TIMEOUT = int(os.environ.get('SMS_TIMEOUT', '10'))
+
+SPARROW_SMS_TOKEN = os.environ.get('SPARROW_SMS_TOKEN', '')
+SPARROW_SMS_FROM = os.environ.get('SPARROW_SMS_FROM', '')
+
+AAKASH_SMS_TOKEN = os.environ.get('AAKASH_SMS_TOKEN', '')

@@ -1,0 +1,151 @@
+{% extends "base.html" %}
+
+{% block title %}नागरिक लगइन | माछापुच्छ्रे गाउँपालिका{% endblock %}
+
+{% block content %}
+
+<div class="container mt-5">
+
+<div class="row justify-content-center">
+
+<div class="col-md-6">
+
+
+<div class="card">
+
+<div class="card-body p-5">
+
+
+<h3 class="text-center text-success mb-2">
+
+<i class="bi bi-phone"></i>
+
+नागरिक लगइन
+
+</h3>
+
+
+<p class="text-center text-muted">
+
+आफ्नो मोबाइल नम्बर हाल्नुहोस्। हामी SMS मार्फत कोड पठाउनेछौँ।
+
+</p>
+
+
+{% if error %}
+
+<div class="alert alert-danger text-center">
+
+{{ error }}
+
+</div>
+
+{% endif %}
+
+
+<form method="POST">
+
+{% csrf_token %}
+
+
+<label class="form-label fw-bold">मोबाइल नम्बर</label>
+
+<input
+type="text"
+name="phone"
+id="id_phone"
+class="form-control form-control-lg mb-4"
+placeholder="९८XXXXXXXX"
+maxlength="10"
+minlength="10"
+pattern="9[78][0-9]{8}"
+inputmode="numeric"
+autocomplete="tel"
+autofocus
+required>
+
+
+<button type="submit" class="btn btn-success w-100 btn-lg">
+
+<i class="bi bi-send"></i>
+
+कोड पठाउनुहोस्
+
+</button>
+
+
+</form>
+
+
+<hr class="my-4">
+
+
+<div class="alert alert-light border small mb-0">
+
+<i class="bi bi-info-circle"></i>
+
+<strong>लगइन अनिवार्य होइन।</strong>
+लगइन नगरी पनि गुनासो दर्ता गर्न सकिन्छ — तर त्यसो गर्दा
+गुनासो ID आफैँ टिपेर राख्नुपर्छ। लगइन गरेमा सबै गुनासो
+एकै ठाउँमा देखिन्छ र फारम आफैँ भरिन्छ।
+
+</div>
+
+
+<div class="text-center mt-3">
+
+<span class="text-muted small">खाता छैन?</span>
+
+<a href="{% url 'citizen_signup' %}">नयाँ खाता खोल्नुहोस्</a>
+
+<span class="text-muted mx-2">·</span>
+
+<a href="{% url 'complaint_track' %}">ID बाट ट्र्याक</a>
+
+</div>
+
+
+</div>
+
+</div>
+
+
+</div>
+
+</div>
+
+</div>
+
+{% endblock %}
+
+
+{% block extra_js %}
+
+<script>
+
+// Keep the field to 10 digits, matching the complaint form.
+const phoneInput = document.getElementById("id_phone");
+
+if(phoneInput){
+
+    phoneInput.addEventListener("input", function(){
+
+        let digits = this.value.replace(/\D/g, "");
+
+        if(digits.startsWith("977") && digits.length > 10){
+            digits = digits.slice(3);
+        }
+
+        if(digits.startsWith("0") && digits.length > 10){
+            digits = digits.slice(1);
+        }
+
+        this.value = digits.slice(0, 10);
+
+    });
+
+}
+
+</script>
+
+{% endblock %}

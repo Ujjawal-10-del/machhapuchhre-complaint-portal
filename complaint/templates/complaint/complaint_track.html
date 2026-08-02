@@ -1,105 +1,12 @@
-{% load static %}
-<!DOCTYPE html>
-<html lang="ne">
+{% extends "base.html" %}
 
-<head>
+{% block title %}गुनासो ट्र्याक | माछापुच्छ्रे गाउँपालिका{% endblock %}
 
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
-
-<title>गुनासो ट्र्याक | माछापुच्छ्रे गाउँपालिका</title>
-
-<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.7/dist/css/bootstrap.min.css" rel="stylesheet">
-
-<link rel="stylesheet"
-href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.13.1/font/bootstrap-icons.min.css">
+{% block extra_css %}
 
 <style>
 
-body{
-
-font-family:
-"Nirmala UI",
-"Mangal",
-"Kalimati",
-sans-serif;
-
-background:#eef3f8;
-
-}
-
-.navbar{
-
-background:white;
-
-box-shadow:0 2px 15px rgba(0,0,0,.08);
-
-}
-
-.logo{
-
-width:60px;
-
-height:60px;
-
-margin-right:15px;
-
-}
-
-.navbar-brand{
-
-font-size:28px;
-
-font-weight:700;
-
-color:#0b6b45!important;
-
-}
-
-.banner{
-
-background:
-
-linear-gradient(rgba(0,70,45,.75),rgba(0,70,45,.75)),
-url("{% static 'images/mountain.jpg' %}");
-
-background-size:cover;
-
-background-position:center;
-
-padding:70px 20px;
-
-text-align:center;
-
-color:white;
-
-}
-
-.banner h2{
-
-font-size:45px;
-
-font-weight:800;
-
-}
-
-.track-card{
-
-margin-top:-45px;
-
-background:white;
-
-border:none;
-
-border-radius:20px;
-
-box-shadow:0 12px 35px rgba(0,0,0,.08);
-
-position:relative;
-
-z-index:10;
-
-}
+/* overlap handled by the shared .overlap-card class */
 
 .form-control{
 
@@ -111,7 +18,7 @@ border-radius:10px;
 
 .btn-success{
 
-padding:13px 35px;
+padding:13px clamp(18px, 4vw, 35px);
 
 font-weight:700;
 
@@ -121,55 +28,24 @@ border-radius:10px;
 
 .result-card{
 
-border-radius:15px;
-
 margin-top:30px;
 
 }
 
 .badge{
 
-font-size:15px;
+font-size:clamp(0.8rem, 2vw, 0.95rem);
 
-padding:10px 18px;
-
-}
-
-footer{
-
-margin-top:70px;
-
-background:#065f46;
-
-color:white;
-
-padding:35px;
+padding:8px 14px;
 
 }
 
 </style>
 
-</head>
+{% endblock %}
 
-<body>
 
-<nav class="navbar">
-
-<div class="container">
-
-<a class="navbar-brand d-flex align-items-center" href="/">
-
-<img
-src="{% static 'images/logo.png' %}"
-class="logo">
-
-माछापुच्छ्रे गाउँपालिका
-
-</a>
-
-</div>
-
-</nav>
+{% block content %}
 
 <section class="banner">
 
@@ -189,41 +65,35 @@ class="logo">
 
 </section>
 
+
 <div class="container">
 
-<div class="card track-card">
+<div class="card overlap-card">
 
 <div class="card-body p-5">
+
 
 <form method="POST">
 
 {% csrf_token %}
 
-<div class="row">
+<div class="row g-3">
 
 <div class="col-md-9">
 
 <input
-
 type="text"
-
 name="complaint_id"
-
 class="form-control"
-
 placeholder="MC-XXXXXXXX लेख्नुहोस्"
-
+autofocus
 required>
 
 </div>
 
 <div class="col-md-3">
 
-<button
-
-class="btn btn-success w-100"
-
-type="submit">
+<button class="btn btn-success w-100" type="submit">
 
 <i class="bi bi-search"></i>
 
@@ -236,6 +106,8 @@ type="submit">
 </div>
 
 </form>
+
+
 {% if error %}
 
 <div class="alert alert-danger mt-4 text-center">
@@ -248,9 +120,152 @@ type="submit">
 
 {% endif %}
 
+
+{% if message %}
+
+<div class="alert alert-success mt-4 text-center">
+
+<i class="bi bi-check-circle-fill"></i>
+
+{{ message }}
+
+</div>
+
+{% endif %}
+
+
+{% if complaint.awaiting_confirmation %}
+
+<!-- ================= CITIZEN CONFIRMATION ================= -->
+
+<div class="card border-primary mt-4">
+
+<div class="card-body p-4">
+
+
+<h5 class="fw-bold text-primary">
+
+<i class="bi bi-patch-question"></i>
+
+वडा कार्यालयले यो गुनासो समाधान भएको जनाएको छ
+
+</h5>
+
+<p class="text-muted">
+
+के साँच्चै तपाईंको समस्या समाधान भयो? तपाईंको जवाफले वडाको
+कार्यसम्पादन विवरण सही राख्न मद्दत गर्छ।
+
+</p>
+
+
+<div class="row g-3">
+
+
+<div class="col-md-5">
+
+<form method="POST" action="{% url 'confirm_resolution' %}">
+
+{% csrf_token %}
+
+<input type="hidden" name="complaint_id" value="{{ complaint.complaint_id }}">
+
+<input type="hidden" name="answer" value="yes">
+
+<button type="submit" class="btn btn-success w-100">
+
+<i class="bi bi-check-lg"></i>
+
+हो, समाधान भयो
+
+</button>
+
+</form>
+
+</div>
+
+
+<div class="col-md-7">
+
+<form method="POST" action="{% url 'confirm_resolution' %}">
+
+{% csrf_token %}
+
+<input type="hidden" name="complaint_id" value="{{ complaint.complaint_id }}">
+
+<input type="hidden" name="answer" value="no">
+
+<div class="input-group">
+
+<input type="text" name="reason" class="form-control"
+placeholder="किन भएन? (वैकल्पिक)">
+
+<button type="submit" class="btn btn-outline-danger">
+
+<i class="bi bi-x-lg"></i>
+
+होइन, भएको छैन
+
+</button>
+
+</div>
+
+</form>
+
+</div>
+
+
+</div>
+
+
+<small class="text-muted d-block mt-3">
+
+“होइन” छान्नुभयो भने गुनासो पुनः वडा कार्यालयको सूचीमा जान्छ।
+
+</small>
+
+
+</div>
+
+</div>
+
+{% endif %}
+
+
+{% if complaint.citizen_confirmed is True %}
+
+<div class="alert alert-success mt-4">
+
+<i class="bi bi-patch-check-fill"></i>
+
+<strong>नागरिकद्वारा पुष्टि भएको</strong> —
+
+{{ complaint.confirmed_at|date:"d M Y" }}
+
+</div>
+
+{% elif complaint.citizen_confirmed is False %}
+
+<div class="alert alert-warning mt-4">
+
+<i class="bi bi-exclamation-circle-fill"></i>
+
+<strong>नागरिकले समाधान भएको छैन भनेका छन्</strong>
+
+{% if complaint.dispute_reason %}
+
+<br>कारण: {{ complaint.dispute_reason }}
+
+{% endif %}
+
+</div>
+
+{% endif %}
+
+
 {% if complaint %}
 
-<div class="card result-card shadow mt-5">
+<div class="card result-card shadow">
 
 <div class="card-header bg-success text-white">
 
@@ -273,83 +288,52 @@ type="submit">
 <table class="table table-bordered">
 
 <tr>
-
 <th width="35%">Complaint ID</th>
-
 <td>{{ complaint.complaint_id }}</td>
-
 </tr>
 
 <tr>
-
 <th>नागरिकको नाम</th>
-
 <td>{{ complaint.citizen_name }}</td>
-
 </tr>
 
 <tr>
-
 <th>फोन नम्बर</th>
+<td>
 
-<td>{{ complaint.phone }}</td>
+{# Masked: this page is public to anyone holding the ID. #}
+{{ complaint.phone|slice:":3" }}*****{{ complaint.phone|slice:"-2:" }}
 
+</td>
 </tr>
 
 <tr>
-
-<th>ठेगाना</th>
-
-<td>{{ complaint.address }}</td>
-
-</tr>
-
-<tr>
-
 <th>वडा</th>
-
 <td>वडा नं. {{ complaint.ward }}</td>
-
 </tr>
 
 <tr>
-
 <th>गुनासोको प्रकार</th>
-
 <td>{{ complaint.category }}</td>
-
 </tr>
 
 <tr>
-
 <th>प्राथमिकता</th>
-
 <td>{{ complaint.priority }}</td>
-
 </tr>
 
 <tr>
-
 <th>शीर्षक</th>
-
 <td>{{ complaint.subject }}</td>
-
 </tr>
 
 <tr>
-
 <th>विवरण</th>
-
 <td>{{ complaint.description }}</td>
-
 </tr>
+
 <tr>
-
-<th>
-वडा कार्यालयको जवाफ
-</th>
-
-
+<th>वडा कार्यालयको जवाफ</th>
 <td>
 
 {% if complaint.reply %}
@@ -363,12 +347,10 @@ type="submit">
 {% endif %}
 
 </td>
-
 </tr>
+
 <tr>
-
 <th>दर्ता मिति</th>
-
 <td>
 
 {{ complaint.created_at|date:"d M Y" }}
@@ -382,13 +364,10 @@ type="submit">
 </small>
 
 </td>
-
 </tr>
 
 <tr>
-
 <th>स्थिति</th>
-
 <td>
 
 {% if complaint.status == "Resolved" %}
@@ -424,8 +403,16 @@ Pending
 {% endif %}
 
 </td>
-
 </tr>
+
+{% if complaint.resolved_at %}
+
+<tr>
+<th>समाधान मिति</th>
+<td>{{ complaint.resolved_at|date:"d M Y, H:i" }}</td>
+</tr>
+
+{% endif %}
 
 </table>
 
@@ -436,11 +423,8 @@ Pending
 {% if complaint.image %}
 
 <img
-
 src="{{ complaint.image.url }}"
-
 class="img-fluid rounded shadow"
-
 style="max-height:300px;">
 
 {% else %}
@@ -465,15 +449,15 @@ style="max-height:300px;">
 
 {% endif %}
 
+
 </div>
 
-</div><!-- ================= ACTION BUTTONS ================= -->
+</div>
+
 
 <div class="text-center mt-5">
 
-<a
-href="{% url 'home' %}"
-class="btn btn-outline-success btn-lg me-2">
+<a href="{% url 'home' %}" class="btn btn-outline-success btn-lg me-2">
 
 <i class="bi bi-house-fill"></i>
 
@@ -481,9 +465,7 @@ class="btn btn-outline-success btn-lg me-2">
 
 </a>
 
-<a
-href="{% url 'complaint_register' %}"
-class="btn btn-success btn-lg me-2">
+<a href="{% url 'complaint_register' %}" class="btn btn-success btn-lg me-2">
 
 <i class="bi bi-pencil-square"></i>
 
@@ -491,57 +473,9 @@ class="btn btn-success btn-lg me-2">
 
 </a>
 
-<a
-href="{% url 'complaint_track' %}"
-class="btn btn-warning btn-lg text-white">
+</div>
 
-<i class="bi bi-search"></i>
-
-फेरि खोज्नुहोस्
-
-</a>
 
 </div>
 
-</div>
-
-</div>
-
-<!-- ================= FOOTER ================= -->
-
-<footer>
-
-<div class="container text-center">
-
-<h4 class="fw-bold">
-
- माछापुच्छ्रे गाउँपालिका
-
-</h4>
-
-<p class="mb-2">
-    माछापुच्छ्रे नागरिक गुनासो पोर्टल
-
-</p>
-
-<p class="mb-1">
-
-कास्की, गण्डकी प्रदेश, नेपाल
-
-</p>
-
-<small>
-
-© २०२६ माछापुच्छ्रे गाउँपालिका । सबै अधिकार सुरक्षित।
-
-</small>
-
-</div>
-
-</footer>
-
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.7/dist/js/bootstrap.bundle.min.js"></script>
-
-</body>
-
-</html>
+{% endblock %}

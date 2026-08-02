@@ -1,88 +1,29 @@
+{% extends "base.html" %}
 {% load static %}
-<!DOCTYPE html>
-<html lang="ne">
 
-<head>
+{% block title %}माछापुच्छ्रे गाउँपालिका कास्की, गण्डकी प्रदेश | नागरिक गुनासो प्रणाली{% endblock %}
 
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
-
-<title>माछापुच्छ्रे गाउँपालिका कास्की, गण्डकी प्रदेश| नागरिक गुनासो तथा बजेट ट्र्याकिङ प्रणाली</title>
-
-<!-- Bootstrap -->
-
-<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.7/dist/css/bootstrap.min.css" rel="stylesheet">
-
-<!-- Bootstrap Icons -->
-
-<link rel="stylesheet"
-href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.13.1/font/bootstrap-icons.min.css">
+{% block extra_css %}
 
 <style>
 
-*{
-margin:0;
-padding:0;
-box-sizing:border-box;
-}
-
-body{
-
-font-family:
-"Nirmala UI",
-"Mangal",
-"Kalimati",
-sans-serif;
-
-background:#f5f7fb;
-
-overflow-x:hidden;
-
-}
-
-/*===================== NAVBAR =====================*/
-
-.navbar{
-
-background:#ffffff;
-
-box-shadow:0 3px 15px rgba(0,0,0,.08);
-
-padding:12px 0;
-
-}
-
-.logo{
-
-width:65px;
-
-height:65px;
-
-object-fit:contain;
-
-margin-right:15px;
-
-}
-
-.navbar-brand{
-
-font-size:30px;
-
-font-weight:700;
-
-color:#0b6b45 !important;
-
+:root{
+--page-bg:#f5f7fb;
 }
 
 /*===================== HERO =====================*/
 
 .hero{
 
-min-height:92vh;
+/* Height follows the content. The previous fixed 88vh/780px was shorter than
+   the heading plus intro plus buttons, so the buttons fell outside it. */
+min-height:auto;
+
+padding:clamp(44px, 6vw, 80px) 0;
 
 background:
 linear-gradient(rgba(0,70,45,.72),rgba(0,70,45,.72)),
-url("{% static 'images/mountain.jpg' %}"); 
+url("{% static 'images/mountain.jpg' %}");
 
 background-size:cover;
 
@@ -92,39 +33,57 @@ display:flex;
 
 align-items:center;
 
-color:white;
+color:#fff;
 
 }
 
 .hero h1{
 
-font-size:56px;
+font-size:var(--fs-hero);
 
 font-weight:800;
 
-line-height:1.35;
+line-height:1.25;
+
+margin-bottom:0;
+
+}
+
+/* The English title was rendering at full heading size, which alone filled
+   the hero. It is a subtitle, so it now reads like one. */
+.hero-sub{
+
+display:block;
+
+margin-top:.35rem;
+
+font-size:var(--fs-hero-sub);
+
+font-weight:600;
+
+opacity:.92;
 
 }
 
 .hero p{
 
-font-size:21px;
+font-size:var(--fs-lead);
 
-margin-top:25px;
+margin-top:clamp(14px, 2.5vw, 25px);
 
-line-height:1.9;
+line-height:1.85;
 
-max-width:700px;
+max-width:62ch;
 
 }
 
 .hero-buttons{
 
-margin-top:35px;
+margin-top:clamp(20px, 3.5vw, 35px);
 
 display:flex;
 
-gap:15px;
+gap:12px;
 
 flex-wrap:wrap;
 
@@ -132,9 +91,9 @@ flex-wrap:wrap;
 
 .hero-buttons .btn{
 
-padding:14px 30px;
+padding:13px clamp(18px, 3vw, 30px);
 
-font-size:18px;
+font-size:clamp(0.95rem, 1.6vw, 1.125rem);
 
 font-weight:700;
 
@@ -142,104 +101,62 @@ border-radius:10px;
 
 }
 
-.btn-success{
+/* On the narrowest phones stacked full-width buttons beat three cramped ones. */
+@media (max-width: 400px){
 
-background:#198754;
-
-border:none;
+.hero-buttons{
+flex-direction:column;
+align-items:stretch;
+}
 
 }
 
-.btn-warning{
-
-color:#fff;
-
-background:#fd7e14;
-
-border:none;
-
+.hero-logo{
+max-width:min(300px, 60vw);
 }
 
-.btn-light{
-
-background:white;
-
+/* The logo beside the hero text is decorative; on phones it just pushes the
+   call-to-action buttons below the fold. */
+@media (max-width: 991.98px){
+.hero-media{ display:none; }
 }
 
-/*===================== COMMON =====================*/
-
-.section-title{
-
-font-size:42px;
-
-font-weight:800;
-
-color:#0b6b45;
-
-}
+/*===================== CARDS =====================*/
 
 .feature-card{
 
-border:none;
+border-radius:var(--radius-lg);
 
-border-radius:20px;
+box-shadow:var(--shadow);
 
-box-shadow:0 10px 30px rgba(0,0,0,.08);
-
-transition:.35s;
+transition:transform .3s ease, box-shadow .3s ease;
 
 }
 
 .feature-card:hover{
 
-transform:translateY(-10px);
+transform:translateY(-8px);
+
+box-shadow:var(--shadow-lg);
 
 }
 
-footer{
+.feature-icon{
+font-size:clamp(38px, 6vw, 58px);
+line-height:1;
+}
 
-background:#065f46;
-
-color:white;
-
-padding:50px 0;
-
-margin-top:80px;
-
+.stat-icon{
+font-size:clamp(30px, 5vw, 45px);
+line-height:1;
 }
 
 </style>
 
-</head>
+{% endblock %}
 
-<body>
 
-<!--===================== NAVBAR =====================-->
-
-<nav class="navbar navbar-expand-lg">
-
-<div class="container">
-
-<a class="navbar-brand d-flex align-items-center" href="/">
-
-<img
-src="{% static 'images/logo.jpg' %}"
-class="logo"
-alt="Logo">
-
-<span>
-
- माछापुच्छ्रे गाउँपालिका <br>
-
-कास्की, गण्डकी प्रदेश
-
-</span>
-
-</a>
-
-</div>
-
-</nav>
+{% block content %}
 
 <!--===================== HERO =====================-->
 
@@ -255,9 +172,7 @@ alt="Logo">
 
 माछापुच्छ्रे नागरिक गुनासो पोर्टल
 
-<br>
-
-Macchapuchhre Citizen Complaint Portal
+<span class="hero-sub">Machhapuchhre Citizen Complaint Portal</span>
 
 </h1>
 
@@ -273,9 +188,7 @@ Macchapuchhre Citizen Complaint Portal
 
 <div class="hero-buttons">
 
-<a
-href="{% url 'complaint_register' %}"
-class="btn btn-success">
+<a href="{% url 'complaint_register' %}" class="btn btn-success">
 
 <i class="bi bi-pencil-square"></i>
 
@@ -283,9 +196,7 @@ class="btn btn-success">
 
 </a>
 
-<a
-href="{% url 'complaint_track' %}"
-class="btn btn-warning">
+<a href="{% url 'complaint_track' %}" class="btn btn-accent">
 
 <i class="bi bi-search"></i>
 
@@ -293,9 +204,7 @@ class="btn btn-warning">
 
 </a>
 
-<a
-href="{% url 'ward_login' %}"
-class="btn btn-light">
+<a href="{% url 'ward_login' %}" class="btn btn-light">
 
 <i class="bi bi-person-lock"></i>
 
@@ -307,12 +216,12 @@ class="btn btn-light">
 
 </div>
 
-<div class="col-lg-5 text-center">
+<div class="col-lg-5 text-center hero-media">
 
 <img
 src="{% static 'images/logo.jpg' %}"
-class="img-fluid"
-style="max-width:300px;">
+class="img-fluid hero-logo"
+alt="">
 
 </div>
 
@@ -322,8 +231,10 @@ style="max-width:300px;">
 
 </section>
 
+
 <div class="container py-5">
-    <!-- ===================== SERVICES ===================== -->
+
+<!-- ===================== SERVICES ===================== -->
 
 <div class="text-center mb-5">
 
@@ -341,6 +252,7 @@ style="max-width:300px;">
 
 </div>
 
+
 <div class="row g-4">
 
 <!-- Complaint Register -->
@@ -353,8 +265,7 @@ style="max-width:300px;">
 
 <div class="mb-4">
 
-<i class="bi bi-pencil-square text-success"
-style="font-size:60px;"></i>
+<i class="bi bi-pencil-square text-success feature-icon"></i>
 
 </div>
 
@@ -372,9 +283,7 @@ style="font-size:60px;"></i>
 
 </p>
 
-<a
-href="{% url 'complaint_register' %}"
-class="btn btn-success mt-3">
+<a href="{% url 'complaint_register' %}" class="btn btn-success mt-3">
 
 दर्ता गर्नुहोस्
 
@@ -386,6 +295,7 @@ class="btn btn-success mt-3">
 
 </div>
 
+
 <!-- Complaint Track -->
 
 <div class="col-lg-4">
@@ -396,8 +306,7 @@ class="btn btn-success mt-3">
 
 <div class="mb-4">
 
-<i class="bi bi-search text-warning"
-style="font-size:60px;"></i>
+<i class="bi bi-search text-accent feature-icon"></i>
 
 </div>
 
@@ -414,9 +323,7 @@ style="font-size:60px;"></i>
 
 </p>
 
-<a
-href="{% url 'complaint_track' %}"
-class="btn btn-warning text-white mt-3">
+<a href="{% url 'complaint_track' %}" class="btn btn-accent mt-3">
 
 अवस्था हेर्नुहोस्
 
@@ -428,6 +335,7 @@ class="btn btn-warning text-white mt-3">
 
 </div>
 
+
 <!-- Ward Login -->
 
 <div class="col-lg-4">
@@ -438,8 +346,7 @@ class="btn btn-warning text-white mt-3">
 
 <div class="mb-4">
 
-<i class="bi bi-person-lock text-primary"
-style="font-size:60px;"></i>
+<i class="bi bi-person-lock text-primary feature-icon"></i>
 
 </div>
 
@@ -457,9 +364,7 @@ style="font-size:60px;"></i>
 
 </p>
 
-<a
-href="{% url 'ward_login' %}"
-class="btn btn-primary mt-3">
+<a href="{% url 'ward_login' %}" class="btn btn-primary mt-3">
 
 Login
 
@@ -473,6 +378,7 @@ Login
 
 </div>
 
+
 <!-- ===================== ABOUT ===================== -->
 
 <div class="row align-items-center mt-5 pt-5">
@@ -480,7 +386,7 @@ Login
 <div class="col-lg-6">
 
 <img
-url("{% static 'images/mountain.jpg' %}")
+src="{% static 'images/mountain.jpg' %}"
 class="img-fluid rounded-4 shadow-lg"
 alt="Machhapuchhre">
 
@@ -515,33 +421,17 @@ alt="Machhapuchhre">
 
 <div class="col-6">
 
-<h3 class="text-success fw-bold">
+<h3 class="text-success fw-bold">९</h3>
 
-९
-
-</h3>
-
-<p>
-
-वडा कार्यालय
-
-</p>
+<p>वडा कार्यालय</p>
 
 </div>
 
 <div class="col-6">
 
-<h3 class="text-success fw-bold">
+<h3 class="text-success fw-bold">२४/७</h3>
 
-२४/७
-
-</h3>
-
-<p>
-
-अनलाइन सेवा
-
-</p>
+<p>अनलाइन सेवा</p>
 
 </div>
 
@@ -550,6 +440,8 @@ alt="Machhapuchhre">
 </div>
 
 </div>
+
+
 <!-- ================= WHY CHOOSE THIS SYSTEM ================= -->
 
 <section class="py-5">
@@ -578,14 +470,9 @@ alt="Machhapuchhre">
 
 <div class="card-body p-4">
 
-<i class="bi bi-lightning-charge-fill text-warning"
-style="font-size:55px;"></i>
+<i class="bi bi-lightning-charge-fill text-warning feature-icon"></i>
 
-<h5 class="mt-3 fw-bold">
-
-छिटो सेवा
-
-</h5>
+<h5 class="mt-3 fw-bold">छिटो सेवा</h5>
 
 <p class="text-muted">
 
@@ -605,14 +492,9 @@ style="font-size:55px;"></i>
 
 <div class="card-body p-4">
 
-<i class="bi bi-shield-check text-success"
-style="font-size:55px;"></i>
+<i class="bi bi-shield-check text-success feature-icon"></i>
 
-<h5 class="mt-3 fw-bold">
-
-सुरक्षित प्रणाली
-
-</h5>
+<h5 class="mt-3 fw-bold">सुरक्षित प्रणाली</h5>
 
 <p class="text-muted">
 
@@ -632,14 +514,9 @@ style="font-size:55px;"></i>
 
 <div class="card-body p-4">
 
-<i class="bi bi-graph-up-arrow text-primary"
-style="font-size:55px;"></i>
+<i class="bi bi-graph-up-arrow text-primary feature-icon"></i>
 
-<h5 class="mt-3 fw-bold">
-
-प्रगति ट्र्याकिङ
-
-</h5>
+<h5 class="mt-3 fw-bold">प्रगति ट्र्याकिङ</h5>
 
 <p class="text-muted">
 
@@ -659,14 +536,9 @@ style="font-size:55px;"></i>
 
 <div class="card-body p-4">
 
-<i class="bi bi-people-fill text-danger"
-style="font-size:55px;"></i>
+<i class="bi bi-people-fill text-danger feature-icon"></i>
 
-<h5 class="mt-3 fw-bold">
-
-पारदर्शिता
-
-</h5>
+<h5 class="mt-3 fw-bold">पारदर्शिता</h5>
 
 <p class="text-muted">
 
@@ -684,6 +556,7 @@ style="font-size:55px;"></i>
 
 </section>
 
+
 <!-- ================= QUICK STATISTICS ================= -->
 
 <section class="py-5">
@@ -696,20 +569,11 @@ style="font-size:55px;"></i>
 
 <div class="card-body">
 
-<i class="bi bi-building text-success"
-style="font-size:45px;"></i>
+<i class="bi bi-building text-success stat-icon"></i>
 
-<h2 class="fw-bold text-success mt-3">
+<h2 class="fw-bold text-success mt-3">९</h2>
 
-९
-
-</h2>
-
-<p class="mb-0">
-
-वडा कार्यालय
-
-</p>
+<p class="mb-0">वडा कार्यालय</p>
 
 </div>
 
@@ -723,20 +587,11 @@ style="font-size:45px;"></i>
 
 <div class="card-body">
 
-<i class="bi bi-clock-history text-primary"
-style="font-size:45px;"></i>
+<i class="bi bi-clock-history text-primary stat-icon"></i>
 
-<h2 class="fw-bold text-primary mt-3">
+<h2 class="fw-bold text-primary mt-3">२४/७</h2>
 
-२४/७
-
-</h2>
-
-<p class="mb-0">
-
-अनलाइन सेवा
-
-</p>
+<p class="mb-0">अनलाइन सेवा</p>
 
 </div>
 
@@ -750,20 +605,11 @@ style="font-size:45px;"></i>
 
 <div class="card-body">
 
-<i class="bi bi-laptop text-warning"
-style="font-size:45px;"></i>
+<i class="bi bi-laptop text-warning stat-icon"></i>
 
-<h2 class="fw-bold text-warning mt-3">
+<h2 class="fw-bold text-warning mt-3">१००%</h2>
 
-१००%
-
-</h2>
-
-<p class="mb-0">
-
-डिजिटल सेवा
-
-</p>
+<p class="mb-0">डिजिटल सेवा</p>
 
 </div>
 
@@ -777,20 +623,11 @@ style="font-size:45px;"></i>
 
 <div class="card-body">
 
-<i class="bi bi-award text-danger"
-style="font-size:45px;"></i>
+<i class="bi bi-award text-danger stat-icon"></i>
 
-<h2 class="fw-bold text-danger mt-3">
+<h2 class="fw-bold text-danger mt-3">विश्वसनीय</h2>
 
-विश्वसनीय
-
-</h2>
-
-<p class="mb-0">
-
-सेवा प्रणाली
-
-</p>
+<p class="mb-0">सेवा प्रणाली</p>
 
 </div>
 
@@ -801,6 +638,7 @@ style="font-size:45px;"></i>
 </div>
 
 </section>
+
 
 <!-- ================= CALL TO ACTION ================= -->
 
@@ -824,8 +662,7 @@ style="font-size:45px;"></i>
 
 <div class="mt-4">
 
-<a href="{% url 'complaint_register' %}"
-class="btn btn-light btn-lg me-2">
+<a href="{% url 'complaint_register' %}" class="btn btn-light btn-lg me-2">
 
 <i class="bi bi-pencil-square"></i>
 
@@ -833,8 +670,7 @@ class="btn btn-light btn-lg me-2">
 
 </a>
 
-<a href="{% url 'complaint_track' %}"
-class="btn btn-warning btn-lg text-white">
+<a href="{% url 'complaint_track' %}" class="btn btn-accent btn-lg">
 
 <i class="bi bi-search"></i>
 
@@ -849,6 +685,8 @@ class="btn btn-warning btn-lg text-white">
 </div>
 
 </section>
+
+
 <!-- ================= CONTACT ================= -->
 
 <section class="py-5">
@@ -880,8 +718,6 @@ class="btn btn-warning btn-lg text-white">
 कास्की, गण्डकी प्रदेश
 
 </p>
-
-
 
 <p>
 
@@ -915,35 +751,15 @@ info@machhapuchhremun.gov.np
 
 <ul class="list-group list-group-flush">
 
-<li class="list-group-item">
+<li class="list-group-item">✅ अनलाइन गुनासो दर्ता</li>
 
-✅ अनलाइन गुनासो दर्ता
+<li class="list-group-item">✅ गुनासो ट्र्याकिङ</li>
 
-</li>
+<li class="list-group-item">✅ वडा कार्यालय व्यवस्थापन</li>
 
-<li class="list-group-item">
+<li class="list-group-item">✅ गुनासोको स्थिति अद्यावधिक</li>
 
-✅ गुनासो ट्र्याकिङ
-
-</li>
-
-<li class="list-group-item">
-
-✅ वडा कार्यालय व्यवस्थापन
-
-</li>
-
-<li class="list-group-item">
-
-✅ गुनासोको स्थिति अद्यावधिक
-
-</li>
-
-<li class="list-group-item">
-
-✅ पारदर्शी डिजिटल सेवा
-
-</li>
+<li class="list-group-item">✅ पारदर्शी डिजिटल सेवा</li>
 
 </ul>
 
@@ -990,52 +806,6 @@ style="width:140px;">
 
 </section>
 
-<!-- ================= FOOTER ================= -->
-
-<footer>
-
-<div class="container">
-
-<div class="row align-items-center">
-
-<div class="col-md-6">
-
-<h4 class="fw-bold">
-
-🏛️ माछापुच्छ्रे गाउँपालिका
-
-</h4>
-
-<p class="mb-0">
-
-माछापुच्छ्रे नागरिक गुनासो पोर्टल
-
-</p>
-
 </div>
 
-<div class="col-md-6 text-md-end mt-3 mt-md-0">
-
-<p class="mb-1">
-
-© २०२६ माछापुच्छ्रे गाउँपालिका
-
-</p>
-
-
-
-</div>
-
-</div>
-
-</div>
-
-</footer>
-
-<!-- Bootstrap JS -->
-
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.7/dist/js/bootstrap.bundle.min.js"></script>
-
-</body>
-
-</html>
+{% endblock %}

@@ -1,0 +1,97 @@
+{% comment %}
+Shared pager. Expects "page_obj" and "querystring" (the current filters with
+any page parameter already stripped).
+{% endcomment %}
+
+{% if page_obj.paginator.num_pages > 1 %}
+
+<nav class="mt-5">
+
+<ul class="pagination justify-content-center">
+
+
+{% comment %}
+previous_page_number/next_page_number raise at the ends of the range, so they
+must only ever be evaluated inside these guards.
+{% endcomment %}
+
+{% if page_obj.has_previous %}
+
+<li class="page-item">
+
+<a class="page-link" href="?{{ querystring }}page={{ page_obj.previous_page_number }}">
+
+<i class="bi bi-chevron-left"></i>
+
+</a>
+
+</li>
+
+{% else %}
+
+<li class="page-item disabled">
+
+<span class="page-link"><i class="bi bi-chevron-left"></i></span>
+
+</li>
+
+{% endif %}
+
+
+{% for num in page_obj.paginator.page_range %}
+
+{% if num == page_obj.number %}
+
+<li class="page-item active">
+<span class="page-link">{{ num }}</span>
+</li>
+
+{% elif num > page_obj.number|add:"-3" and num < page_obj.number|add:"3" %}
+
+<li class="page-item">
+<a class="page-link" href="?{{ querystring }}page={{ num }}">{{ num }}</a>
+</li>
+
+{% endif %}
+
+{% endfor %}
+
+
+{% if page_obj.has_next %}
+
+<li class="page-item">
+
+<a class="page-link" href="?{{ querystring }}page={{ page_obj.next_page_number }}">
+
+<i class="bi bi-chevron-right"></i>
+
+</a>
+
+</li>
+
+{% else %}
+
+<li class="page-item disabled">
+
+<span class="page-link"><i class="bi bi-chevron-right"></i></span>
+
+</li>
+
+{% endif %}
+
+
+</ul>
+
+
+<p class="text-center text-muted small">
+
+जम्मा {{ page_obj.paginator.count }} मध्ये
+{{ page_obj.start_index }}–{{ page_obj.end_index }}
+(पृष्ठ {{ page_obj.number }}/{{ page_obj.paginator.num_pages }})
+
+</p>
+
+
+</nav>
+
+{% endif %}

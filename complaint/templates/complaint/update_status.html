@@ -1,60 +1,12 @@
-<!DOCTYPE html>
-<html lang="ne">
+{% extends "base_ward.html" %}
 
-<head>
+{% block title %}गुनासो स्थिति अपडेट | माछापुच्छ्रे गाउँपालिका{% endblock %}
 
-<meta charset="UTF-8">
-
-<meta name="viewport" content="width=device-width, initial-scale=1">
-
-<title>
-गुनासो स्थिति अपडेट
-</title>
-
-
-<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.7/dist/css/bootstrap.min.css" rel="stylesheet">
-
-
-<style>
-
-body{
-
-background:#eef3f8;
-
-font-family:
-"Nirmala UI",
-"Mangal",
-"Kalimati",
-sans-serif;
-
-}
-
-
-.card{
-
-border:none;
-
-border-radius:20px;
-
-box-shadow:0 10px 30px rgba(0,0,0,.1);
-
-}
-
-
-</style>
-
-
-</head>
-
-
-<body>
-
+{% block content %}
 
 <div class="container mt-5">
 
-
 <div class="row justify-content-center">
-
 
 <div class="col-md-6">
 
@@ -73,9 +25,18 @@ box-shadow:0 10px 30px rgba(0,0,0,.1);
 </div>
 
 
-
 <div class="card-body p-4">
 
+
+{% if error %}
+
+<div class="alert alert-danger">
+
+{{ error }}
+
+</div>
+
+{% endif %}
 
 
 <div class="mb-4">
@@ -85,54 +46,30 @@ box-shadow:0 10px 30px rgba(0,0,0,.1);
 
 गुनासो ID:
 
-<span class="text-success">
-
-{{ complaint.complaint_id }}
-
-</span>
+<span class="text-success">{{ complaint.complaint_id }}</span>
 
 </h5>
 
 
-
 <p>
-
-<strong>
-
-शीर्षक:
-
-</strong>
-
+<strong>शीर्षक:</strong>
 {{ complaint.subject }}
-
 </p>
 
 
-
-<p>
-
-<strong>
-
-हालको स्थिति:
-
-</strong>
-
+<p class="mb-0">
+<strong>हालको स्थिति:</strong>
 {{ complaint.status }}
-
 </p>
 
 
 </div>
 
 
-
-
-
 <form method="POST">
 
 
 {% csrf_token %}
-
 
 
 <label class="form-label fw-bold">
@@ -142,68 +79,27 @@ box-shadow:0 10px 30px rgba(0,0,0,.1);
 </label>
 
 
-
 <select
-
 name="status"
-
 class="form-select mb-4"
-
 required>
 
-
 <option value="Pending"
-
-{% if complaint.status == "Pending" %}
-
-selected
-
-{% endif %}
-
->
-
+{% if complaint.status == "Pending" %}selected{% endif %}>
 Pending
-
 </option>
-
-
 
 <option value="In Progress"
-
-{% if complaint.status == "In Progress" %}
-
-selected
-
-{% endif %}
-
->
-
+{% if complaint.status == "In Progress" %}selected{% endif %}>
 In Progress
-
 </option>
-
-
 
 <option value="Resolved"
-
-{% if complaint.status == "Resolved" %}
-
-selected
-
-{% endif %}
-
->
-
+{% if complaint.status == "Resolved" %}selected{% endif %}>
 Resolved
-
 </option>
 
-
-
 </select>
-
-
-
 
 
 <label class="form-label fw-bold">
@@ -213,26 +109,16 @@ Resolved
 </label>
 
 
-
 <textarea
-
 name="reply"
-
 class="form-control mb-4"
-
 rows="6"
-
 placeholder="नागरिकलाई दिनुपर्ने जवाफ लेख्नुहोस्..."
-
 >{{ complaint.reply|default:"" }}</textarea>
 
 
-
-
 <button
-
 type="submit"
-
 class="btn btn-primary w-100">
 
 <i class="bi bi-save"></i>
@@ -242,30 +128,18 @@ class="btn btn-primary w-100">
 </button>
 
 
-
 </form>
-
-
 
 
 <div class="text-center mt-3">
 
-
-<a
-
-href="{% url 'complaint_detail' complaint.id %}"
-
+<a href="{% url 'complaint_detail' complaint.id %}"
 class="btn btn-outline-secondary">
 
 फिर्ता जानुहोस्
 
 </a>
 
-
-</div>
-
-
-
 </div>
 
 
@@ -277,10 +151,8 @@ class="btn btn-outline-secondary">
 
 </div>
 
+</div>
 
 </div>
 
-
-</body>
-
-</html>
+{% endblock %}
