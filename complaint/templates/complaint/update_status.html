@@ -1,0 +1,286 @@
+<!DOCTYPE html>
+<html lang="ne">
+
+<head>
+
+<meta charset="UTF-8">
+
+<meta name="viewport" content="width=device-width, initial-scale=1">
+
+<title>
+गुनासो स्थिति अपडेट
+</title>
+
+
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.7/dist/css/bootstrap.min.css" rel="stylesheet">
+
+
+<style>
+
+body{
+
+background:#eef3f8;
+
+font-family:
+"Nirmala UI",
+"Mangal",
+"Kalimati",
+sans-serif;
+
+}
+
+
+.card{
+
+border:none;
+
+border-radius:20px;
+
+box-shadow:0 10px 30px rgba(0,0,0,.1);
+
+}
+
+
+</style>
+
+
+</head>
+
+
+<body>
+
+
+<div class="container mt-5">
+
+
+<div class="row justify-content-center">
+
+
+<div class="col-md-6">
+
+
+<div class="card">
+
+
+<div class="card-header bg-primary text-white text-center">
+
+<h4 class="mb-0">
+
+📌 गुनासो स्थिति परिवर्तन
+
+</h4>
+
+</div>
+
+
+
+<div class="card-body p-4">
+
+
+
+<div class="mb-4">
+
+
+<h5>
+
+गुनासो ID:
+
+<span class="text-success">
+
+{{ complaint.complaint_id }}
+
+</span>
+
+</h5>
+
+
+
+<p>
+
+<strong>
+
+शीर्षक:
+
+</strong>
+
+{{ complaint.subject }}
+
+</p>
+
+
+
+<p>
+
+<strong>
+
+हालको स्थिति:
+
+</strong>
+
+{{ complaint.status }}
+
+</p>
+
+
+</div>
+
+
+
+
+
+<form method="POST">
+
+
+{% csrf_token %}
+
+
+
+<label class="form-label fw-bold">
+
+नयाँ स्थिति चयन गर्नुहोस्
+
+</label>
+
+
+
+<select
+
+name="status"
+
+class="form-select mb-4"
+
+required>
+
+
+<option value="Pending"
+
+{% if complaint.status == "Pending" %}
+
+selected
+
+{% endif %}
+
+>
+
+Pending
+
+</option>
+
+
+
+<option value="In Progress"
+
+{% if complaint.status == "In Progress" %}
+
+selected
+
+{% endif %}
+
+>
+
+In Progress
+
+</option>
+
+
+
+<option value="Resolved"
+
+{% if complaint.status == "Resolved" %}
+
+selected
+
+{% endif %}
+
+>
+
+Resolved
+
+</option>
+
+
+
+</select>
+
+
+
+
+
+<label class="form-label fw-bold">
+
+वडा कार्यालयको जवाफ
+
+</label>
+
+
+
+<textarea
+
+name="reply"
+
+class="form-control mb-4"
+
+rows="6"
+
+placeholder="नागरिकलाई दिनुपर्ने जवाफ लेख्नुहोस्..."
+
+>{{ complaint.reply|default:"" }}</textarea>
+
+
+
+
+<button
+
+type="submit"
+
+class="btn btn-primary w-100">
+
+<i class="bi bi-save"></i>
+
+स्थिति अपडेट गर्नुहोस्
+
+</button>
+
+
+
+</form>
+
+
+
+
+<div class="text-center mt-3">
+
+
+<a
+
+href="{% url 'complaint_detail' complaint.id %}"
+
+class="btn btn-outline-secondary">
+
+फिर्ता जानुहोस्
+
+</a>
+
+
+</div>
+
+
+
+</div>
+
+
+</div>
+
+
+</div>
+
+
+</div>
+
+
+</div>
+
+
+</body>
+
+</html>

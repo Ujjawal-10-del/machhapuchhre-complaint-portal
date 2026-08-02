@@ -1,0 +1,246 @@
+{% load static %}
+
+<!DOCTYPE html>
+<html lang="ne">
+
+<head>
+
+<meta charset="UTF-8">
+
+<meta name="viewport" content="width=device-width, initial-scale=1">
+
+<title>
+गुनासो विवरण
+</title>
+
+
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.7/dist/css/bootstrap.min.css" rel="stylesheet">
+
+
+</head>
+
+
+<body class="bg-light">
+
+
+<div class="container mt-5">
+
+
+<div class="card shadow rounded-4">
+
+
+<div class="card-header bg-success text-white">
+
+<h3 class="mb-0">
+
+📄 गुनासो विवरण
+
+</h3>
+
+</div>
+
+
+
+<div class="card-body p-4">
+
+
+<table class="table table-bordered">
+
+
+<tr>
+
+<th>
+गुनासो ID
+</th>
+
+<td>
+{{ complaint.complaint_id }}
+</td>
+
+</tr>
+
+
+
+<tr>
+
+<th>
+नागरिकको नाम
+</th>
+
+<td>
+{{ complaint.citizen_name }}
+</td>
+
+</tr>
+
+
+
+<tr>
+
+<th>
+फोन नम्बर
+</th>
+
+<td>
+{{ complaint.phone }}
+</td>
+
+</tr>
+
+
+
+<tr>
+
+<th>
+ठेगाना
+</th>
+
+<td>
+{{ complaint.address }}
+</td>
+
+</tr>
+
+
+
+<tr>
+
+<th>
+वडा
+</th>
+
+<td>
+वडा नं. {{ complaint.ward }}
+</td>
+
+</tr>
+
+
+
+<tr>
+
+<th>
+समस्या प्रकार
+</th>
+
+<td>
+{{ complaint.category }}
+</td>
+
+</tr>
+
+
+
+<tr>
+
+<th>
+प्राथमिकता
+</th>
+
+<td>
+{{ complaint.priority }}
+</td>
+
+</tr>
+
+
+
+<tr>
+
+<th>
+शीर्षक
+</th>
+
+<td>
+{{ complaint.subject }}
+</td>
+
+</tr>
+
+
+
+<tr>
+
+<th>
+विवरण
+</th>
+
+<td>
+{{ complaint.description }}
+</td>
+
+</tr>
+
+
+
+<tr>
+
+<th>
+स्थिति
+</th>
+
+<td>
+
+{{ complaint.status }}
+
+</td>
+
+</tr>
+
+
+</table>
+
+
+
+{% if complaint.image %}
+
+<div class="text-center">
+
+<img src="{{ complaint.image.url }}"
+class="img-fluid rounded"
+style="max-height:300px;">
+
+</div>
+
+{% endif %}
+
+
+
+<div class="text-center mt-4">
+
+
+<a href="{% url 'update_status' complaint.id %}"
+
+class="btn btn-primary">
+
+स्थिति परिवर्तन गर्नुहोस्
+
+</a>
+
+
+
+<a href="{% url 'ward_dashboard' %}"
+
+class="btn btn-outline-success">
+
+फिर्ता
+
+</a>
+
+
+</div>
+
+
+
+</div>
+
+
+</div>
+
+
+</div>
+
+
+</body>
+
+</html>

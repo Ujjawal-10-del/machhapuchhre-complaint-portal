@@ -1,0 +1,590 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="ne">
+
+<head>
+
+<meta charset="UTF-8">
+<meta name="viewport"
+content="width=device-width, initial-scale=1">
+
+<title>
+
+गुनासो दर्ता |
+माछापुच्छ्रे गाउँपालिका
+
+</title>
+
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.7/dist/css/bootstrap.min.css"
+rel="stylesheet">
+
+<link rel="stylesheet"
+href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.13.1/font/bootstrap-icons.min.css">
+
+<style>
+
+*{
+
+margin:0;
+padding:0;
+box-sizing:border-box;
+
+}
+
+body{
+
+font-family:
+
+"Nirmala UI",
+"Mangal",
+"Kalimati",
+sans-serif;
+
+background:#eef3f8;
+
+}
+
+/*================ NAVBAR ================*/
+
+.navbar{
+
+background:white;
+
+box-shadow:0 2px 12px rgba(0,0,0,.08);
+
+}
+
+.logo{
+
+width:60px;
+
+height:60px;
+
+margin-right:15px;
+
+}
+
+.navbar-brand{
+
+font-size:28px;
+
+font-weight:700;
+
+color:#0b6b45!important;
+
+}
+
+/*================ HERO ================*/
+
+.banner{
+
+background:
+
+linear-gradient(rgba(0,70,45,.78),
+rgba(0,70,45,.78)),
+
+url("{% static 'images/mountain.jpg' %}");
+
+background-size:cover;
+
+background-position:center;
+
+padding:65px 20px;
+
+text-align:center;
+
+color:white;
+
+}
+
+.banner h2{
+
+font-size:45px;
+
+font-weight:800;
+
+}
+
+.banner p{
+
+font-size:20px;
+
+margin-top:15px;
+
+}
+
+/*================ FORM CARD ================*/
+
+.form-card{
+
+margin-top:-45px;
+
+background:white;
+
+border:none;
+
+border-radius:20px;
+
+box-shadow:0 12px 35px rgba(0,0,0,.08);
+
+position:relative;
+
+z-index:10;
+
+}
+
+.form-label{
+
+font-weight:700;
+
+color:#075985;
+
+}
+
+.form-control,
+.form-select{
+
+padding:12px;
+
+border-radius:10px;
+
+}
+
+.form-control:focus,
+.form-select:focus{
+
+border-color:#198754;
+
+box-shadow:0 0 0 .15rem rgba(25,135,84,.20);
+
+}
+
+.required{
+
+color:red;
+
+}
+
+.counter{
+
+float:right;
+
+font-size:13px;
+
+color:#777;
+
+}
+
+.btn-success{
+
+padding:13px 35px;
+
+font-weight:700;
+
+border-radius:10px;
+
+}
+
+.preview{
+
+max-width:260px;
+
+display:none;
+
+border-radius:15px;
+
+margin-top:20px;
+
+box-shadow:0 10px 25px rgba(0,0,0,.15);
+
+}
+
+</style>
+
+</head>
+
+<body>
+
+<nav class="navbar">
+
+<div class="container">
+
+<a class="navbar-brand d-flex align-items-center"
+href="{% url 'home' %}">
+
+<img
+
+src="{% static 'images/logo.png' %}"
+
+class="logo"
+
+alt="Logo">
+
+<span>
+
+माछापुच्छ्रे गाउँपालिका
+
+</span>
+
+</a>
+
+</div>
+
+</nav>
+
+<section class="banner">
+
+<div class="container">
+
+<h2>
+
+<i class="bi bi-pencil-square"></i>
+
+गुनासो दर्ता
+
+</h2>
+
+<p>
+
+आफ्नो गुनासो सुरक्षित रूपमा दर्ता गर्नुहोस्।
+
+</p>
+
+</div>
+
+</section>
+
+<div class="container">
+
+<div class="card form-card">
+
+<div class="card-body p-5">
+
+<form method="POST"
+enctype="multipart/form-data">
+
+{% csrf_token %}
+{% if form.errors %}
+
+<div class="alert alert-danger">
+
+<strong>कृपया तलका त्रुटिहरू सुधार गर्नुहोस्:</strong>
+
+{{ form.errors }}
+
+</div>
+
+{% endif %}
+
+<div class="row">
+<!-- ================= NAME ================= -->
+
+<div class="col-md-6 mb-4">
+
+<label class="form-label">
+
+पूरा नाम
+<span class="required">*</span>
+
+</label>
+
+{{ form.citizen_name }}
+
+</div>
+
+<!-- ================= PHONE ================= -->
+
+<div class="col-md-6 mb-4">
+
+<label class="form-label">
+
+मोबाइल नम्बर
+
+</label>
+
+{{ form.phone }}
+
+</div>
+
+<!-- ================= ADDRESS ================= -->
+
+<div class="col-12 mb-4">
+
+<label class="form-label">
+
+ठेगाना
+
+</label>
+
+{{ form.address }}
+
+</div>
+
+<!-- ================= WARD ================= -->
+
+<div class="col-md-6 mb-4">
+
+<label class="form-label">
+
+वडा नम्बर
+
+<span class="required">*</span>
+
+</label>
+
+{{ form.ward }}
+
+</div>
+
+<!-- ================= CATEGORY ================= -->
+
+<div class="col-md-6 mb-4">
+
+<label class="form-label">
+
+गुनासोको प्रकार
+
+</label>
+
+{{ form.category }}
+
+</div>
+
+<!-- ================= PRIORITY ================= -->
+
+<div class="col-md-6 mb-4">
+
+<label class="form-label">
+
+प्राथमिकता
+
+</label>
+
+{{ form.priority }}
+
+</div>
+
+<!-- ================= SUBJECT ================= -->
+
+<div class="col-md-6 mb-4">
+
+<label class="form-label">
+
+गुनासो शीर्षक
+
+<span class="required">*</span>
+
+</label>
+
+{{ form.subject }}
+
+</div>
+
+<!-- ================= DESCRIPTION ================= -->
+
+<div class="col-12 mb-4">
+
+<label class="form-label">
+
+गुनासोको विस्तृत विवरण
+
+<span class="counter">
+
+<span id="count">0</span>/500
+
+</span>
+
+</label>
+
+{{ form.description }}
+
+</div>
+
+<!-- ================= IMAGE ================= -->
+
+<div class="col-md-6 mb-4">
+
+<label class="form-label">
+
+तस्वीर अपलोड गर्नुहोस्
+
+</label>
+
+{{ form.image }}
+
+</div>
+
+<div class="col-md-6 text-center">
+
+<img
+
+id="preview"
+
+class="preview"
+
+src="">
+
+</div>
+
+<div class="col-12">
+
+<div class="d-flex justify-content-center gap-3 flex-wrap mt-3">
+
+<button
+
+type="submit"
+
+class="btn btn-success btn-lg">
+
+<i class="bi bi-send-fill"></i>
+
+गुनासो दर्ता गर्नुहोस्
+
+</button>
+
+<a
+
+href="{% url 'home' %}"
+
+class="btn btn-outline-secondary btn-lg">
+
+<i class="bi bi-house"></i>
+
+गृहपृष्ठ
+
+</a>
+
+<button
+
+type="reset"
+
+class="btn btn-outline-danger btn-lg">
+
+<i class="bi bi-arrow-clockwise"></i>
+
+Reset
+
+</button>
+
+</div>
+
+</div>
+</div>
+
+</form>
+
+</div>
+
+</div>
+
+</div>
+
+</div>
+
+<!-- ================= FOOTER ================= -->
+
+<footer
+style="
+margin-top:70px;
+background:#065f46;
+color:white;
+padding:35px 0;">
+
+<div class="container text-center">
+
+<h4 class="fw-bold">
+ माछापुच्छ्रे गाउँपालिका
+</h4>
+
+<p class="mb-2">
+माछापुच्छ्रे नागरिक गुनासो पोर्टल
+</p>
+
+<small>
+© २०२६ माछापुच्छ्रे गाउँपालिका    All rights reserved
+</small>
+
+</div>
+
+</footer>
+
+
+<!-- ================= JAVASCRIPT ================= -->
+
+<script>
+
+// Description character counter
+
+const textarea = document.getElementById("id_description");
+const counter = document.getElementById("count");
+
+if(textarea && counter){
+
+    textarea.setAttribute("maxlength","500");
+
+    textarea.addEventListener("input", function(){
+
+        counter.innerText = this.value.length;
+
+    });
+
+}
+
+
+// Image preview
+
+const imageInput = document.getElementById("id_image");
+const preview = document.getElementById("preview");
+
+if(imageInput && preview){
+
+    imageInput.addEventListener("change", function(){
+
+        const file = this.files[0];
+
+        if(file){
+
+            preview.src = URL.createObjectURL(file);
+            preview.style.display = "block";
+
+        }
+        else{
+
+            preview.style.display = "none";
+            preview.src = "";
+
+        }
+
+    });
+
+}
+
+
+// Submit button loading
+
+const form = document.querySelector("form");
+
+if(form){
+
+    form.addEventListener("submit", function(){
+
+        const btn = form.querySelector("button[type='submit']");
+
+        if(btn){
+
+            btn.disabled = true;
+
+            btn.innerHTML =
+            '<span class="spinner-border spinner-border-sm me-2"></span>दर्ता हुँदैछ...';
+
+        }
+
+    });
+
+}
+
+</script>
+
+
+</body>
+</html>
